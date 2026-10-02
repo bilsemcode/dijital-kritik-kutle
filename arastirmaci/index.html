@@ -1,1 +1,165 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Araştırmacı Paneli — Dijital Kritik Kütle</title>
+<style>
+:root{
+  --bg:#f5f7fb;--paper:#fff;--ink:#263247;--muted:#707c92;--line:#e4e9f1;
+  --blue:#7ba5f2;--blue2:#edf4ff;--lav:#a895e8;--lav2:#f3efff;--mint:#7bc5ae;--mint2:#edf9f5;
+  --peach:#efb58f;--red:#db7d87;--shadow:0 18px 50px rgba(63,79,118,.10)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(180deg,#fafbfe,#f4f6fb);color:var(--ink);min-height:100vh}
+button,input,select{font:inherit}.wrap{max-width:1240px;margin:0 auto;padding:22px 18px 44px}
+.card{background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.gate{max-width:480px;margin:80px auto;padding:28px}.gate h1{font-size:24px;margin:8px 0}.gate p{color:var(--muted);line-height:1.6}
+.kicker{display:inline-flex;background:var(--lav2);color:#705eb2;border:1px solid #e5dcff;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800}
+label{display:block;font-size:12px;font-weight:800;color:#5d6b83;margin:18px 0 7px}
+input,select{width:100%;border:1px solid #dfe5ee;background:#fff;color:var(--ink);padding:12px 13px;border-radius:12px;outline:none}
+input:focus,select:focus{border-color:#a8bff0;box-shadow:0 0 0 4px rgba(123,165,242,.12)}
+.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:850;cursor:pointer}.btn.primary{color:#fff;background:linear-gradient(135deg,#7da7f1,#9287db)}.btn.ghost{background:#fff;border:1px solid var(--line);color:#5c6980}.btn.danger{background:#fff0f1;color:#b95f68;border:1px solid #f1d4d7}
+.hidden{display:none!important}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#8db5f5,#b0a1e8);display:grid;place-items:center;color:#fff;font-weight:900}
+.brand h1{font-size:18px;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.hero{padding:22px;margin-bottom:16px;background:linear-gradient(135deg,#ffffff,#fafaff)}
+.hero h2{font-size:22px;margin:0 0 6px}.hero p{color:var(--muted);margin:0;line-height:1.55;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.stat{padding:16px}.stat .label{font-size:11px;color:var(--muted);font-weight:800}.stat .val{font-size:25px;font-weight:900;margin-top:5px}.stat .trend{font-size:10px;margin-top:3px;color:#8793a6}
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-bottom:16px}
+.panel{padding:18px}.panel h3{font-size:14px;margin:0 0 14px}.sub{font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:13px}
+.barrow{display:grid;grid-template-columns:92px 1fr 54px;gap:10px;align-items:center;margin:11px 0;font-size:12px}
+.bar{height:11px;background:#eef1f6;border-radius:999px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#7ba8f1,#a996e5)}
+.legend{display:flex;gap:11px;flex-wrap:wrap;margin-top:13px;font-size:10px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.dist{display:flex;flex-direction:column;gap:10px}.dist-row{display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:center}.dist-row b{font-size:12px}.dist-row small{color:var(--muted);font-size:10px}
+.filters{display:grid;grid-template-columns:1fr 180px 180px;gap:10px;margin-bottom:12px}
+.tablewrap{overflow:auto;max-height:480px;border:1px solid var(--line);border-radius:13px}
+table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:10px;border-bottom:1px solid #edf0f5;text-align:left;white-space:nowrap}th{position:sticky;top:0;background:#f8faff;color:#6c7890;z-index:1}
+td{color:#3e4a60}.tag{padding:4px 7px;border-radius:999px;font-size:10px;font-weight:800}.tag.active{background:var(--mint2);color:#4f967f}.tag.passive{background:#f3f5f8;color:#6f7c90}.tag.support{background:#fff1f2;color:#b86871}
+.notice{padding:12px 14px;background:#fff9ef;border:1px solid #f1e1c1;color:#816a43;border-radius:12px;font-size:11px;line-height:1.5;margin-top:14px}
+@media(max-width:900px){.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.wrap{padding:14px 10px 30px}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="gate" class="card gate">
+    <span class="kicker">Araştırmacı erişimi</span>
+    <h1>Dijital Kritik Kütle</h1>
+    <p>Bu ekran pilot araştırma verilerini görüntülemek için hazırlanmıştır.</p>
+    <label for="pin">Erişim kodu</label>
+    <input id="pin" type="password" inputmode="numeric" placeholder="••••">
+    <div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" id="login">Panele Gir</button></div>
+    <div class="notice">Not: GitHub Pages statik bir sistem olduğu için bu PIN gerçek sunucu güvenliği sağlamaz. Jüri demosunda öğrenci ekranından paneli ayırmak için kullanılır. Gerçek uygulamada sunucu taraflı kimlik doğrulama eklenmelidir.</div>
+  </section>
 
+  <main id="dashboard" class="hidden">
+    <div class="top">
+      <div class="brand"><div class="logo">DK</div><div><h1>Araştırmacı Paneli</h1><p>Dijital Kritik Kütle • Pilot veri görünümü</p></div></div>
+      <div class="toolbar">
+        <button class="btn ghost" id="refresh">Yenile</button>
+        <button class="btn primary" id="download">CSV İndir</button>
+        <button class="btn danger" id="clear">Pilot Veriyi Sil</button>
+      </div>
+    </div>
+
+    <section class="card hero">
+      <h2>Genel Araştırma Özeti</h2>
+      <p>Panel, aynı tarayıcıda gerçekleştirilen pilot oturumlardaki davranışsal seçimleri özetler. Aktif savunma, özelden destek, grupta açıkça karşı çıkma ve bildirim/yardım isteme davranışlarının toplamıdır.</p>
+    </section>
+
+    <section class="stats">
+      <div class="card stat"><div class="label">KATILIMCI</div><div class="val" id="participants">0</div><div class="trend">benzersiz oturum</div></div>
+      <div class="card stat"><div class="label">TOPLAM KARAR</div><div class="val" id="decisions">0</div><div class="trend">senaryo yanıtı</div></div>
+      <div class="card stat"><div class="label">AKTİF SAVUNMA</div><div class="val" id="activePct">0%</div><div class="trend">tüm kararlar içinde</div></div>
+      <div class="card stat"><div class="label">KAMUSAL SAVUNMA</div><div class="val" id="publicPct">0%</div><div class="trend">grupta açık karşı çıkma</div></div>
+      <div class="card stat"><div class="label">ORT. KARAR SÜRESİ</div><div class="val" id="avgRt">0</div><div class="trend">saniye</div></div>
+    </section>
+
+    <section class="grid">
+      <div class="card panel">
+        <h3>Savunucu akran sayısına göre aktif savunma oranı</h3>
+        <div class="sub">Kritik kütle eğrisinin ilk görsel kontrolü</div>
+        <div id="bars"></div>
+        <div class="legend"><span><i class="dot" style="background:#7ba8f1"></i>Aktif savunma oranı</span></div>
+      </div>
+      <div class="card panel">
+        <h3>Davranış dağılımı</h3>
+        <div class="sub">Tüm pilot kararlarının seçeneklere göre dağılımı</div>
+        <div id="distribution" class="dist"></div>
+      </div>
+    </section>
+
+    <section class="card panel">
+      <h3>Karar kayıtları</h3>
+      <div class="filters">
+        <input id="search" placeholder="Katılımcı veya senaryo ara">
+        <select id="gradeFilter"><option value="">Tüm sınıflar</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
+        <select id="defFilter"><option value="">Tüm savunucu düzeyleri</option><option value="0">0 savunucu</option><option value="1">1 savunucu</option><option value="2">2 savunucu</option><option value="3">3 savunucu</option><option value="4">4 savunucu</option></select>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Katılımcı</th><th>Sınıf</th><th>Senaryo</th><th>Sıra</th><th>Savunucu</th><th>Karar</th><th>Tür</th><th>Süre</th><th>Zaman</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="notice">Bu prototipte öğrenci ve araştırmacı ekranları ayrılmıştır. Ancak veriler localStorage ile tutulduğu için farklı cihazlardaki katılımcı verileri burada birleşmez. Gerçek saha uygulamasında merkezi veritabanı ve gerçek araştırmacı kimlik doğrulaması eklenmelidir.</div>
+    </section>
+  </main>
+</div>
+
+<script>
+const STORAGE_KEY="dkk_pilot_v1";
+const DEMO_PIN="2204";
+const $=id=>document.getElementById(id);
+function readStore(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){return[]}}
+function csvEscape(v){const s=String(v??"");return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function downloadCSV(rows){
+  if(!rows.length){alert("İndirilecek veri yok.");return}
+  const cols=["session_id","participant_id","grade","order_no","scenario_id","defender_count","decision","decision_kind","rt_ms","timestamp"];
+  const text=[cols.join(","),...rows.map(r=>cols.map(c=>csvEscape(r[c])).join(","))].join("\n");
+  const blob=new Blob(["\ufeff"+text],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="dijital_kritik_kutle_pilot_"+Date.now()+".csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)
+}
+function pct(n,d){return d?100*n/d:0}
+function labelDecision(d){return({support_aggressor:"Saldırganı destekleme",silent:"Sessiz kalma",private_support:"Özelden destek",public_defend:"Grupta karşı çıkma",report:"Bildirim / yardım"}[d]||d)}
+function tag(kind){if(kind==="aktif")return'<span class="tag active">Aktif</span>';if(kind==="destek")return'<span class="tag support">Destek</span>';return'<span class="tag passive">Pasif</span>'}
+function render(){
+  const rows=readStore(), sessions=new Set(rows.map(r=>r.session_id)).size;
+  $("participants").textContent=sessions;$("decisions").textContent=rows.length;
+  $("activePct").textContent=pct(rows.filter(r=>r.decision_kind==="aktif").length,rows.length).toFixed(1)+"%";
+  $("publicPct").textContent=pct(rows.filter(r=>r.decision==="public_defend").length,rows.length).toFixed(1)+"%";
+  $("avgRt").textContent=(rows.length?rows.reduce((s,r)=>s+(+r.rt_ms||0),0)/rows.length/1000:0).toFixed(1);
+
+  $("bars").innerHTML="";
+  for(let n=0;n<=4;n++){
+    const g=rows.filter(r=>Number(r.defender_count)===n),v=pct(g.filter(r=>r.decision_kind==="aktif").length,g.length);
+    const d=document.createElement("div");d.className="barrow";d.innerHTML=`<div>${n} savunucu</div><div class="bar"><i style="width:${v}%"></i></div><div>${v.toFixed(0)}%</div>`;$("bars").appendChild(d)
+  }
+
+  const ds=["support_aggressor","silent","private_support","public_defend","report"];
+  $("distribution").innerHTML="";
+  ds.forEach(k=>{
+    const n=rows.filter(r=>r.decision===k).length,v=pct(n,rows.length);
+    const d=document.createElement("div");d.className="dist-row";d.innerHTML=`<div><b>${labelDecision(k)}</b><small>${n} karar</small></div><div><b>${v.toFixed(1)}%</b></div>`;$("distribution").appendChild(d)
+  });
+  renderTable();
+}
+function renderTable(){
+  const rows=readStore(),q=$("search").value.trim().toLowerCase(),gf=$("gradeFilter").value,df=$("defFilter").value;
+  const f=rows.filter(r=>(!q||String(r.participant_id).toLowerCase().includes(q)||String(r.scenario_id).toLowerCase().includes(q))&&(!gf||String(r.grade)===gf)&&(!df||String(r.defender_count)===df));
+  $("tbody").innerHTML="";
+  f.slice().reverse().forEach(r=>{
+    const tr=document.createElement("tr");const dt=r.timestamp?new Date(r.timestamp).toLocaleString("tr-TR"):"";
+    tr.innerHTML=`<td>${r.participant_id}</td><td>${r.grade}</td><td>${r.scenario_id}</td><td>${r.order_no}</td><td>${r.defender_count}</td><td>${labelDecision(r.decision)}</td><td>${tag(r.decision_kind)}</td><td>${((+r.rt_ms||0)/1000).toFixed(1)} sn</td><td>${dt}</td>`;$("tbody").appendChild(tr)
+  })
+}
+$("login").onclick=()=>{if($("pin").value===DEMO_PIN){$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");render()}else alert("Erişim kodu hatalı.")};
+$("refresh").onclick=render;$("download").onclick=()=>downloadCSV(readStore());
+$("clear").onclick=()=>{if(confirm("Bu tarayıcıdaki tüm pilot veriler silinsin mi?")){localStorage.removeItem(STORAGE_KEY);render()}};
+["search","gradeFilter","defFilter"].forEach(id=>$(id).addEventListener("input",renderTable));
+</script>
+</body>
+</html>
