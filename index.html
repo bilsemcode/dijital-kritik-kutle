@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dijital Grup İletişimi Araştırması</title>
+<style>
+  :root{
+    --bg:#0b1220;--panel:#111827;--panel2:#172033;--line:#273449;
+    --text:#eef2f7;--muted:#9aa8bd;--accent:#4f8cff;--ok:#22c55e;
+    --warn:#f59e0b;--danger:#ef4444;--purple:#8b5cf6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(180deg,#08101e,#0d1728);color:var(--text);min-height:100vh}
+  button,input,select{font:inherit}
+  .wrap{max-width:920px;margin:0 auto;padding:24px}
+  .card{background:rgba(17,24,39,.96);border:1px solid var(--line);border-radius:18px;box-shadow:0 22px 60px rgba(0,0,0,.25)}
+  .screen{display:none}.screen.active{display:block}
+  .hero{padding:30px}
+  .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7fb0ff;font-weight:800}
+  h1{font-size:30px;line-height:1.15;margin:8px 0 12px}
+  h2{font-size:20px;margin:0 0 12px}
+  p{color:var(--muted);line-height:1.65}
+  .notice{padding:13px 14px;border:1px solid #31425d;background:#121d30;border-radius:12px;color:#c9d5e7;font-size:13px;line-height:1.55}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  label{font-size:12px;font-weight:700;color:#b8c6da;display:block;margin:14px 0 6px}
+  input,select{width:100%;background:#0d1626;color:var(--text);border:1px solid #334155;border-radius:10px;padding:11px 12px;outline:none}
+  input:focus,select:focus{border-color:var(--accent)}
+  .btn{border:0;border-radius:11px;padding:12px 16px;cursor:pointer;font-weight:800}
+  .btn.primary{background:linear-gradient(135deg,#4f8cff,#3067d6);color:#fff}
+  .btn.ghost{background:#182337;color:#d9e3f0;border:1px solid #34445e}
+  .btn.danger{background:#35171d;color:#ffb4b4;border:1px solid #6b2934}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);gap:14px}
+  .brand{font-weight:900}.sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .progress{height:8px;background:#0b1423;border-radius:999px;overflow:hidden;width:220px;max-width:40vw}
+  .progress>div{height:100%;width:0;background:linear-gradient(90deg,#4f8cff,#8b5cf6);transition:width .25s}
+  .study{padding:18px}
+  .chat{max-width:640px;margin:0 auto;background:#0d1626;border:1px solid #25344b;border-radius:18px;overflow:hidden}
+  .chathead{padding:14px 16px;background:#132138;border-bottom:1px solid #27364c}
+  .chatname{font-weight:900}.chatmeta{font-size:11px;color:#93a4bb;margin-top:2px}
+  .messages{padding:16px;min-height:345px;display:flex;flex-direction:column;gap:9px}
+  .msg{max-width:82%;padding:10px 12px;border-radius:14px;line-height:1.45;font-size:14px}
+  .msg.other{align-self:flex-start;background:#1a2639;border-top-left-radius:5px}
+  .msg.aggr{align-self:flex-start;background:#351d27;border:1px solid #5a2838;border-top-left-radius:5px}
+  .msg.def{align-self:flex-start;background:#153326;border:1px solid #23563e;border-top-left-radius:5px}
+  .who{font-size:10px;font-weight:900;margin-bottom:3px;color:#a8bad0}
+  .decision{max-width:640px;margin:14px auto 0}
+  .decision h3{font-size:15px;margin:0 0 9px}
+  .choicegrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .choice{background:#152135;border:1px solid #304058;color:#e5edf7;border-radius:12px;padding:11px;text-align:left;cursor:pointer;transition:.15s}
+  .choice:hover{transform:translateY(-1px);border-color:#5988d8;background:#172842}
+  .choice strong{display:block;font-size:13px}.choice span{display:block;color:#91a4bd;font-size:11px;margin-top:3px}
+  .micro{font-size:11px;color:#8091a9;text-align:center;margin-top:10px}
+  .done{padding:28px}
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+  .stat{background:#111c2d;border:1px solid #2b3a51;border-radius:12px;padding:14px}
+  .stat b{font-size:22px}.stat small{display:block;color:var(--muted);margin-top:4px}
+  .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:10px;border-bottom:1px solid #243248;text-align:left;white-space:nowrap}
+  th{background:#172236;color:#afbdd0;position:sticky;top:0}
+  td{color:#d8e2ee}
+  .research{padding:24px}
+  .badge{display:inline-flex;padding:5px 8px;border-radius:999px;background:#172943;border:1px solid #2b4a76;color:#9fc2ff;font-size:11px;font-weight:800}
+  .barrow{display:grid;grid-template-columns:100px 1fr 58px;gap:10px;align-items:center;margin:9px 0}
+  .bar{height:10px;background:#0b1423;border-radius:999px;overflow:hidden}
+  .bar>div{height:100%;background:linear-gradient(90deg,#4f8cff,#8b5cf6)}
+  .footer{font-size:11px;color:#6f8199;text-align:center;margin:18px 0}
+  @media(max-width:680px){
+    .wrap{padding:10px}.hero,.research,.done{padding:18px}.grid2,.choicegrid,.statgrid{grid-template-columns:1fr}
+    .progress{width:120px}.messages{min-height:390px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="startScreen" class="screen active card">
+    <div class="hero">
+      <div class="eyebrow">Davranışsal Simülasyon Prototipi</div>
+      <h1>Dijital Grup İletişimi Araştırması</h1>
+      <p>Bu prototip, çevrimiçi grup konuşmalarında insanların farklı sosyal durumlarda verdikleri kararları incelemek için hazırlanmıştır. Katılımcının kimliği yerine anonim bir kod kullanılır.</p>
+      <div class="notice">
+        Bu sürüm yalnızca pilot ve yazılım doğrulama amacıyla kullanılmalıdır. Gerçek öğrenci katılımcılarla veri toplamaya geçmeden önce gerekli MEB/etik izin süreçleri tamamlanmalı, veli onamı ve gönüllü katılım prosedürü hazırlanmalıdır.
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label for="pid">Katılımcı kodu</label>
+          <input id="pid" placeholder="Örn. P037" maxlength="20">
+        </div>
+        <div>
+          <label for="grade">Sınıf düzeyi</label>
+          <select id="grade">
+            <option value="">Seçiniz</option>
+            <option>9</option><option>10</option><option>11</option><option>12</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="startBtn">Simülasyonu Başlat</button>
+        <button class="btn ghost" id="researchBtn">Araştırmacı Paneli</button>
+      </div>
+      <p class="micro">Katılımcıya araştırmanın asıl hipotezi deney bitene kadar gösterilmez; böylece davranışın yönlendirilmesi azaltılır.</p>
+    </div>
+  </section>
+
+  <section id="studyScreen" class="screen card">
+    <div class="topbar">
+      <div>
+        <div class="brand">Dijital Grup İletişimi</div>
+        <div class="sub" id="progressText">Senaryo 1 / 20</div>
+      </div>
+      <div class="progress"><div id="progressFill"></div></div>
+    </div>
+    <div class="study">
+      <div class="chat">
+        <div class="chathead">
+          <div class="chatname" id="roomName">Sınıf Grubu</div>
+          <div class="chatmeta">Kurgusal grup konuşması</div>
+        </div>
+        <div class="messages" id="messages"></div>
+      </div>
+      <div class="decision">
+        <h3>Bu konuşmayı gördüğünde ne yapmayı tercih edersin?</h3>
+        <div class="choicegrid" id="choices"></div>
+        <div class="micro">Tek bir seçenek işaretle. Doğru veya yanlış cevap yoktur.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="doneScreen" class="screen card">
+    <div class="done">
+      <div class="eyebrow">Simülasyon Tamamlandı</div>
+      <h2>Teşekkürler</h2>
+      <p>Yanıtların bu cihazda anonim katılımcı koduyla kaydedildi. Araştırmanın amacı, dijital grup ortamında görünür akran tepkilerinin davranışsal kararlarla ilişkisini incelemektir.</p>
+      <div class="statgrid">
+        <div class="stat"><b id="doneN">20</b><small>Tamamlanan senaryo</small></div>
+        <div class="stat"><b id="doneActive">0</b><small>Aktif savunma kararı</small></div>
+        <div class="stat"><b id="donePublic">0</b><small>Kamusal karşı çıkma</small></div>
+        <div class="stat"><b id="doneRT">0</b><small>Ort. karar süresi (sn)</small></div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="downloadSessionBtn">Bu Oturumu CSV İndir</button>
+        <button class="btn ghost" id="newSessionBtn">Yeni Katılımcı</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="researchScreen" class="screen card">
+    <div class="research">
+      <div class="badge">Araştırmacı görünümü</div>
+      <h2 style="margin-top:10px">Dijital Kritik Kütle — Yerel Veri Paneli</h2>
+      <p>Bu panel yalnızca bu tarayıcıda kaydedilmiş pilot oturumları özetler. GitHub Pages sürümünde veri herhangi bir sunucuya gönderilmez.</p>
+      <div class="statgrid">
+        <div class="stat"><b id="rSessions">0</b><small>Oturum</small></div>
+        <div class="stat"><b id="rRows">0</b><small>Karar kaydı</small></div>
+        <div class="stat"><b id="rActive">0%</b><small>Aktif savunma</small></div>
+        <div class="stat"><b id="rPublic">0%</b><small>Kamusal savunma</small></div>
+      </div>
+      <h3 style="font-size:15px">Savunucu akran sayısına göre aktif savunma oranı</h3>
+      <div id="bars"></div>
+      <h3 style="font-size:15px;margin-top:22px">Son kayıtlar</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Katılımcı</th><th>Senaryo</th><th>Savunucu</th><th>Karar</th><th>Tür</th><th>Süre</th></tr></thead>
+          <tbody id="rowsBody"></tbody>
+        </table>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="downloadAllBtn">Tüm Yerel Veriyi CSV İndir</button>
+        <button class="btn ghost" id="backBtn">Başlangıca Dön</button>
+        <button class="btn danger" id="resetBtn">Yerel Pilot Veriyi Sil</button>
+      </div>
+    </div>
+  </section>
+  <div class="footer">Tek dosyalık prototip • Harici kütüphane kullanmaz • GitHub Pages ile çalışır</div>
+</div>
+
+<script>
+const STORAGE_KEY = "dkk_pilot_v1";
+
+const scenarios = [
+ {id:"S01",room:"Sınıf Proje Grubu",pre:[["Duru","Sunum dosyasını akşam paylaşacağım."],["Emir","Ben görselleri hazırladım."]],aggr:["Kaan","Arda sen hiç uğraşma, zaten yaptığın her şeyi bozuyorsun."]},
+ {id:"S02",room:"Sınıf Grubu",pre:[["Ece","Yarınki etkinlik için kimler geliyor?"],["Mert","Ben varım."]],aggr:["Deniz","Selin gelmese daha iyi, onunla uğraşmak istemiyoruz."]},
+ {id:"S03",room:"Etüt Grubu",pre:[["Bora","Soruların 4. kısmını anlayamadım."],["Naz","Ben de biraz zorlandım."]],aggr:["Eren","Bora sen zaten hiçbir şeyi anlamıyorsun, boşuna uğraşma."]},
+ {id:"S04",room:"Kulüp Grubu",pre:[["İpek","Afiş taslağını attım."],["Ada","Bence renkleri güzel olmuş."]],aggr:["Kerem","İpek'in yaptığı şeye bak, çocuk çizimi gibi olmuş."]},
+ {id:"S05",room:"Sınıf Grubu",pre:[["Can","Maç için takım listesini yazalım."],["Ela","Ben kaleye geçebilirim."]],aggr:["Umut","Ozan'ı almayın, her maçta rezil ediyor bizi."]},
+ {id:"S06",room:"Ödev Grubu",pre:[["Asya","Kaynakları paylaşabilir misiniz?"],["Doruk","Birazdan gönderirim."]],aggr:["Baran","Nehir yine hiçbir şey yapmadan not alacak herhalde."]},
+ {id:"S07",room:"Gezi Grubu",pre:[["Melis","Cumartesi saat kaçta buluşuyoruz?"],["Aras","10 gibi olabilir."]],aggr:["Sarp","Mina gelmesin, her şeyi sıkıcı hale getiriyor."]},
+ {id:"S08",room:"Sınıf Sohbeti",pre:[["Yağmur","Bugünkü soruyu kim çözdü?"],["Efe","Ben çözemedim."]],aggr:["Onur","Efe'nin çözememesi şaşırtmadı, sınıfın en tembeli zaten."]},
+ {id:"S09",room:"Müzik Kulübü",pre:[["Lina","Prova videosunu yükledim."],["Mert","Dinledim, güzel olmuş."]],aggr:["Alp","Zeynep'in sesi yüzünden bütün kayıt kötü olmuş."]},
+ {id:"S10",room:"Sınıf Grubu",pre:[["Sena","Kermes görevlerini paylaşalım."],["Toprak","Ben masada durabilirim."]],aggr:["Rüzgar","Beril'e görev vermeyin, yine yarıda bırakır."]},
+ {id:"S11",room:"Proje Ekibi",pre:[["Nisa","Raporun girişini tamamladım."],["Ege","Ben de tabloyu düzenliyorum."]],aggr:["Kuzey","Mete'nin yazdığı kısmı silin, zaten okunmuyor."]},
+ {id:"S12",room:"Sınıf Sohbeti",pre:[["Lara","Bugün fotoğrafları göndereceğim."],["Poyraz","Tamam bekliyoruz."]],aggr:["Doruk","Ayça fotoğraflarda yine çok komik çıkmış."]},
+ {id:"S13",room:"Etkinlik Grubu",pre:[["İrem","Görev dağılımını yaptım."],["Eren","Bana da bakar mısın?"]],aggr:["Kaan","Mert'e önemli iş vermeyin, beceremiyor."]},
+ {id:"S14",room:"Sınıf Grubu",pre:[["Deniz","Herkes sunum konusunu yazsın."],["Ece","Ben çevre konusunu aldım."]],aggr:["Arda","Sude ne anlatsa kimse dinlemiyor zaten."]},
+ {id:"S15",room:"Spor Kulübü",pre:[["Berk","Antrenman 16.00'da."],["Selin","Tamam."]],aggr:["Emir","Ali gelmese takım daha iyi oynuyor."]},
+ {id:"S16",room:"Kütüphane Grubu",pre:[["Dila","Kitap listesini paylaşayım mı?"],["Efe","Olur."]],aggr:["Naz","Cem yine anlamadığı kitaplar hakkında konuşacak."]},
+ {id:"S17",room:"Sınıf Sohbeti",pre:[["Mina","Yarın erken gelecek var mı?"],["Kaan","Ben gelebilirim."]],aggr:["Umut","Duru gelmesin, onsuz daha rahatız."]},
+ {id:"S18",room:"Proje Grubu",pre:[["Sarp","Grafikleri hazırladım."],["Ada","Eline sağlık."]],aggr:["Eren","Ozan'ın kısmı yine kötü, keşke grupta olmasa."]},
+ {id:"S19",room:"Sınıf Grubu",pre:[["Zeynep","Notları gruba attım."],["Can","Teşekkürler."]],aggr:["Bora","Eylül zaten notları da anlamaz, boşuna gönderiyorsunuz."]},
+ {id:"S20",room:"Etüt Sohbeti",pre:[["Aras","Yarın deneme çözecek miyiz?"],["İpek","Ben varım."]],aggr:["Kerem","Mert gelmesin, sürekli herkesi yavaşlatıyor."]}
+];
+
+const defenderMessages = [
+ ["Aylin","Bence böyle konuşmak doğru değil."],
+ ["Mert","Birini gruptan dışlamayalım."],
+ ["Ece","Bu şekilde söylemek yerine sorunu normalce konuşabiliriz."],
+ ["Arda","Ben bu yoruma katılmıyorum, kırıcı olmuş."]
+];
+
+const choices = [
+ {id:"support_aggressor",title:"Saldırgan yorumu desteklerim",desc:"Gülme/like gibi bir tepki veririm.",kind:"destek"},
+ {id:"silent",title:"Sessiz kalırım",desc:"Konuşmaya müdahale etmem.",kind:"pasif"},
+ {id:"private_support",title:"Özelden destek olurum",desc:"Hedef olan kişiye özel mesaj gönderirim.",kind:"aktif"},
+ {id:"public_defend",title:"Grupta karşı çıkarım",desc:"Kırıcı yoruma grupta açıkça itiraz ederim.",kind:"aktif"},
+ {id:"report",title:"Bildiririm / yardım isterim",desc:"Uygun bir yetişkine veya bildirim kanalına iletirim.",kind:"aktif"}
+];
+
+let state = {pid:"",grade:"",order:[],index:0,startedAt:0,sessionRows:[],sessionId:""};
+
+function $(id){return document.getElementById(id)}
+function show(id){
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  $(id).classList.add("active");
+}
+function hashString(str){
+  let h=2166136261;
+  for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}
+  return h>>>0;
+}
+function mulberry32(a){
+  return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296}
+}
+function shuffle(arr,rng){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  return a;
+}
+function readStore(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){return []}}
+function writeStore(v){localStorage.setItem(STORAGE_KEY,JSON.stringify(v))}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function csvEscape(v){
+  const s=String(v??"");
+  return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+}
+function downloadCSV(rows,name){
+  if(!rows.length){alert("İndirilecek veri yok.");return}
+  const cols=["session_id","participant_id","grade","order_no","scenario_id","defender_count","decision","decision_kind","rt_ms","timestamp"];
+  const text=[cols.join(","),...rows.map(r=>cols.map(c=>csvEscape(r[c])).join(","))].join("\n");
+  const blob=new Blob(["\ufeff"+text],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob); const a=document.createElement("a");
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);
+}
+
+function startStudy(){
+  const pid=$("pid").value.trim() || ("P"+Math.floor(1000+Math.random()*9000));
+  const grade=$("grade").value;
+  if(!grade){alert("Lütfen sınıf düzeyini seçin.");return}
+  state.pid=pid;state.grade=grade;state.index=0;state.sessionRows=[];
+  state.sessionId=Date.now()+"_"+pid;
+  const seed=hashString(pid+"|"+state.sessionId.slice(0,8));
+  const rng=mulberry32(seed);
+  state.order=shuffle(scenarios,rng);
+  show("studyScreen"); renderScenario();
+}
+
+function conditionFor(scenarioId){
+  // Katılımcı koduna göre 0-4 arası bir ofset üretir.
+  // 20 senaryoda her savunucu düzeyi tam 4 kez görünür.
+  const participantOffset=hashString(state.pid)%5;
+  const sNum=parseInt(scenarioId.slice(1),10)-1;
+  return (sNum+participantOffset)%5;
+}
+
+function renderScenario(){
+  const sc=state.order[state.index];
+  const defenderCount=conditionFor(sc.id);
+  $("roomName").textContent=sc.room;
+  $("progressText").textContent=`Senaryo ${state.index+1} / ${state.order.length}`;
+  $("progressFill").style.width=((state.index/state.order.length)*100)+"%";
+  const box=$("messages");box.innerHTML="";
+  sc.pre.forEach(([who,text])=>addMsg(who,text,"other"));
+  addMsg(sc.aggr[0],sc.aggr[1],"aggr");
+  for(let i=0;i<defenderCount;i++){
+    const [who,text]=defenderMessages[i];
+    addMsg(who,text,"def");
+  }
+  const cg=$("choices");cg.innerHTML="";
+  choices.forEach(c=>{
+    const b=document.createElement("button");
+    b.className="choice";
+    b.innerHTML=`<strong>${esc(c.title)}</strong><span>${esc(c.desc)}</span>`;
+    b.onclick=()=>recordChoice(c,sc,defenderCount);
+    cg.appendChild(b);
+  });
+  state.startedAt=performance.now();
+}
+function addMsg(who,text,cls){
+  const d=document.createElement("div");d.className="msg "+cls;
+  d.innerHTML=`<div class="who">${esc(who)}</div>${esc(text)}`;
+  $("messages").appendChild(d);
+}
+function recordChoice(choice,sc,defenderCount){
+  const rt=Math.round(performance.now()-state.startedAt);
+  const row={
+    session_id:state.sessionId,participant_id:state.pid,grade:state.grade,
+    order_no:state.index+1,scenario_id:sc.id,defender_count:defenderCount,
+    decision:choice.id,decision_kind:choice.kind,rt_ms:rt,timestamp:new Date().toISOString()
+  };
+  state.sessionRows.push(row);
+  const all=readStore();all.push(row);writeStore(all);
+  state.index++;
+  if(state.index>=state.order.length){finishStudy()} else renderScenario();
+}
+function finishStudy(){
+  $("progressFill").style.width="100%";
+  const rows=state.sessionRows;
+  const active=rows.filter(r=>r.decision_kind==="aktif").length;
+  const pub=rows.filter(r=>r.decision==="public_defend").length;
+  const avg=rows.length?rows.reduce((s,r)=>s+r.rt_ms,0)/rows.length/1000:0;
+  $("doneN").textContent=rows.length;
+  $("doneActive").textContent=active;
+  $("donePublic").textContent=pub;
+  $("doneRT").textContent=avg.toFixed(1);
+  show("doneScreen");
+}
+function renderResearch(){
+  const rows=readStore();
+  const sessions=new Set(rows.map(r=>r.session_id)).size;
+  const active=rows.length?100*rows.filter(r=>r.decision_kind==="aktif").length/rows.length:0;
+  const pub=rows.length?100*rows.filter(r=>r.decision==="public_defend").length/rows.length:0;
+  $("rSessions").textContent=sessions;$("rRows").textContent=rows.length;
+  $("rActive").textContent=active.toFixed(1)+"%";$("rPublic").textContent=pub.toFixed(1)+"%";
+  const bars=$("bars");bars.innerHTML="";
+  for(let n=0;n<=4;n++){
+    const g=rows.filter(r=>Number(r.defender_count)===n);
+    const pct=g.length?100*g.filter(r=>r.decision_kind==="aktif").length/g.length:0;
+    const row=document.createElement("div");row.className="barrow";
+    row.innerHTML=`<div>${n} savunucu</div><div class="bar"><div style="width:${pct}%"></div></div><div>${pct.toFixed(0)}%</div>`;
+    bars.appendChild(row);
+  }
+  const body=$("rowsBody");body.innerHTML="";
+  rows.slice(-40).reverse().forEach(r=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${esc(r.participant_id)}</td><td>${esc(r.scenario_id)}</td><td>${r.defender_count}</td><td>${esc(r.decision)}</td><td>${esc(r.decision_kind)}</td><td>${(r.rt_ms/1000).toFixed(1)} sn</td>`;
+    body.appendChild(tr);
+  });
+}
+
+$("startBtn").onclick=startStudy;
+$("researchBtn").onclick=()=>{renderResearch();show("researchScreen")};
+$("backBtn").onclick=()=>show("startScreen");
+$("newSessionBtn").onclick=()=>{ $("pid").value=""; show("startScreen"); };
+$("downloadSessionBtn").onclick=()=>downloadCSV(state.sessionRows,`dkk_${state.pid}_${Date.now()}.csv`);
+$("downloadAllBtn").onclick=()=>downloadCSV(readStore(),`dkk_tum_pilot_veri_${Date.now()}.csv`);
+$("resetBtn").onclick=()=>{
+  if(confirm("Bu tarayıcıdaki tüm pilot veriler silinsin mi?")){
+    localStorage.removeItem(STORAGE_KEY);renderResearch();
+  }
+};
+</script>
+</body>
+</html>
