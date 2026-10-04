@@ -390,18 +390,19 @@ async function resetAllData(){
   btn.textContent="Siliniyor…";
   $("resetStatus").textContent="Merkezi veritabanı sıfırlanıyor…";
   try{
-    const r=await fetch(SUPABASE_URL+"/rest/v1/responses?id=not.is.null",{
-      method:"DELETE",
+    const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/reset_research_data",{
+      method:"POST",
       headers:{
         "apikey":SUPABASE_KEY,
         "Authorization":"Bearer "+accessToken,
-        "Prefer":"return=minimal"
-      }
+        "Content-Type":"application/json"
+      },
+      body:"{}"
     });
     if(r.status===401){logout();throw new Error("Oturum süresi doldu. Yeniden giriş yapın.");}
     if(!r.ok){
       const detail=await r.text();
-      throw new Error("Silme işlemi başarısız. DELETE yetkisi/RLS politikasını kontrol edin. "+detail);
+      throw new Error("Sıfırlama işlemi başarısız. "+detail);
     }
     rows=[];
     render();
