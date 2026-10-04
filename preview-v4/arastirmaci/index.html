@@ -55,7 +55,34 @@ input:focus,select:focus{border-color:#87c9b8;box-shadow:0 0 0 4px rgba(15,169,1
 .btn.primary{color:#fff;background:var(--brand);box-shadow:0 7px 16px rgba(15,169,135,.15)}
 .btn.primary:hover{background:#0b987b}
 .btn.ghost{background:#fff;border-color:var(--line);color:#4f5c57}
+.btn.danger{background:#fff;color:#a75c6b;border-color:#efd7dd}
+.btn.danger:hover{background:#fff7f8;border-color:#e7c5ce}
+.side-link.danger-link{color:#e2adb8}
+.side-link.danger-link:hover{background:rgba(199,114,132,.12);color:#ffd2da}
 .hidden{display:none!important}
+.reset-modal{
+  position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;
+  background:rgba(9,24,20,.42);backdrop-filter:blur(5px)
+}
+.reset-dialog{
+  width:min(470px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;
+  padding:24px;box-shadow:0 26px 70px rgba(18,42,35,.20)
+}
+.reset-icon{
+  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  background:var(--rose-soft);color:#a85f6e;margin-bottom:15px
+}
+.reset-dialog h3{margin:0 0 8px;font-size:20px;letter-spacing:-.025em}
+.reset-dialog p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.65}
+.reset-warning{
+  margin:16px 0;padding:12px 13px;border:1px solid #efd8dd;border-radius:10px;
+  background:#fff8f9;color:#85515c;font-size:10.5px;line-height:1.55
+}
+.reset-dialog label{color:#66716d;margin-top:15px}
+.reset-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.reset-status{min-height:16px;margin-top:10px;color:#a75c6b;font-size:10px}
+#confirmReset:disabled{opacity:.45;cursor:not-allowed}
+
 .app-shell{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:100vh}
 .sidebar{
   position:sticky;top:0;height:100vh;background:var(--sidebar);color:#fff;padding:22px 15px;
@@ -205,6 +232,10 @@ tbody tr:hover{background:#fbfdfc}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
           <span>CSV Dışa Aktar</span>
         </a>
+        <a class="side-link danger-link" href="#" id="resetData">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 15H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>
+          <span>Verileri Sıfırla</span>
+        </a>
       </nav>
       <div class="side-foot">TÜBİTAK 2204-A<br>Merkezi veri görünümü</div>
     </aside>
@@ -242,6 +273,22 @@ tbody tr:hover{background:#fbfdfc}
         <div class="notice">Araştırmacı erişimi Supabase Auth ile yapılır. GitHub'a yalnızca publishable key konur; secret/service_role key istemci koduna eklenmez.</div>
       </section>
     </section>
+  </div>
+
+  <div id="resetModal" class="reset-modal hidden" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+    <div class="reset-dialog">
+      <div class="reset-icon">!</div>
+      <h3 id="resetTitle">Tüm araştırma verileri silinsin mi?</h3>
+      <p>Bu işlem Supabase'deki <b>tüm pilot ve ana çalışma yanıtlarını</b> kalıcı olarak siler. Paneldeki göstergeler, grafikler ve karar kayıtları sıfırlanır; bundan sonra indirilecek CSV boş olur.</p>
+      <div class="reset-warning"><b>Geri alınamaz.</b> Daha önce bilgisayarınıza indirdiğiniz CSV dosyaları cihazınızdan otomatik olarak silinmez.</div>
+      <label for="resetPhrase">Onaylamak için SIFIRLA yazın</label>
+      <input id="resetPhrase" autocomplete="off" placeholder="SIFIRLA">
+      <div id="resetStatus" class="reset-status"></div>
+      <div class="reset-actions">
+        <button class="btn ghost" id="cancelReset">Vazgeç</button>
+        <button class="btn danger" id="confirmReset" disabled>Tüm Verileri Sil</button>
+      </div>
+    </div>
   </div>
 </main>
 </div>
@@ -325,6 +372,53 @@ function render(){
   f.forEach(r=>{const tr=document.createElement("tr"),dt=r.created_at?new Date(r.created_at).toLocaleString("tr-TR"):"";tr.innerHTML=`<td>${r.participant_code}</td><td>${r.grade}</td><td>${r.scenario_id}</td><td>${r.order_no}</td><td>${r.defender_count}</td><td>${labelDecision(r.decision)}</td><td>${tag(r.decision_kind)}</td><td>${((+r.rt_ms||0)/1000).toFixed(1)} sn</td><td>${r.study_phase}</td><td>${dt}</td>`;$("tbody").appendChild(tr)})
 }
 function csvEscape(v){const s=String(v??"");return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function openResetModal(){
+  $("resetPhrase").value="";
+  $("resetStatus").textContent=rows.length ? rows.length+" kayıt kalıcı olarak silinecek." : "Silinecek kayıt bulunmuyor.";
+  $("confirmReset").disabled=true;
+  $("resetModal").classList.remove("hidden");
+  setTimeout(()=>$("resetPhrase").focus(),50);
+}
+function closeResetModal(){
+  $("resetModal").classList.add("hidden");
+  $("resetStatus").textContent="";
+}
+async function resetAllData(){
+  if($("resetPhrase").value.trim().toUpperCase()!=="SIFIRLA") return;
+  const btn=$("confirmReset");
+  btn.disabled=true;
+  btn.textContent="Siliniyor…";
+  $("resetStatus").textContent="Merkezi veritabanı sıfırlanıyor…";
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/responses?id=not.is.null",{
+      method:"DELETE",
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer "+accessToken,
+        "Prefer":"return=minimal"
+      }
+    });
+    if(r.status===401){logout();throw new Error("Oturum süresi doldu. Yeniden giriş yapın.");}
+    if(!r.ok){
+      const detail=await r.text();
+      throw new Error("Silme işlemi başarısız. DELETE yetkisi/RLS politikasını kontrol edin. "+detail);
+    }
+    rows=[];
+    render();
+    $("search").value="";
+    $("gradeFilter").value="";
+    $("defFilter").value="";
+    $("phaseFilter").value="pilot";
+    render();
+    closeResetModal();
+    alert("Tüm merkezi araştırma verileri başarıyla sıfırlandı.");
+  }catch(e){
+    $("resetStatus").textContent=e.message;
+  }finally{
+    btn.textContent="Tüm Verileri Sil";
+    btn.disabled=$("resetPhrase").value.trim().toUpperCase()!=="SIFIRLA";
+  }
+}
 function downloadCSV(){
   const f=filtered();if(!f.length){alert("İndirilecek veri yok.");return}
   const cols=["id","session_id","participant_code","grade","scenario_id","order_no","defender_count","decision","decision_kind","rt_ms","study_phase","app_version","client_timestamp","created_at"];
@@ -333,6 +427,12 @@ function downloadCSV(){
 }
 $("login").onclick=async()=>{try{$("loginError").textContent="Giriş yapılıyor…";await signIn($("email").value.trim(),$("password").value);$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");$("loginError").textContent="";await fetchRows()}catch(e){$("loginError").textContent=e.message}};
 $("refresh").onclick=()=>fetchRows().catch(e=>alert(e.message));$("download").onclick=downloadCSV;$("logout").onclick=logout;
+$("resetData").onclick=e=>{e.preventDefault();openResetModal()};
+$("cancelReset").onclick=closeResetModal;
+$("resetModal").onclick=e=>{if(e.target===$("resetModal"))closeResetModal()};
+$("resetPhrase").addEventListener("input",()=>{$("confirmReset").disabled=$("resetPhrase").value.trim().toUpperCase()!=="SIFIRLA"});
+$("resetPhrase").addEventListener("keydown",e=>{if(e.key==="Enter"&&!$("confirmReset").disabled)resetAllData()});
+$("confirmReset").onclick=resetAllData;
 ["search","gradeFilter","defFilter","phaseFilter"].forEach(id=>$(id).addEventListener("input",render));
 initSidebarNavigation();
 if(accessToken){$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");fetchRows().catch(()=>logout())}
