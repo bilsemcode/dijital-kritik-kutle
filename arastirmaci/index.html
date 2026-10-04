@@ -146,7 +146,54 @@ input:focus,select:focus{border-color:#87c9b8;box-shadow:0 0 0 4px rgba(15,169,1
 .stat:nth-child(4) .val{color:var(--brand-dark)}
 .stat:nth-child(5) .val{color:var(--rose)}
 .stat .trend{font-size:9px;margin-top:5px;color:#909995}
-.grid{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(320px,.78fr);gap:14px;margin-bottom:14px}
+.analysis-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:2px 0 12px}
+.analysis-head h3{margin:0;font-size:17px;letter-spacing:-.025em}
+.analysis-head p{margin:5px 0 0;color:var(--muted);font-size:9.5px;line-height:1.5}
+.analysis-badge{padding:7px 10px;border:1px solid #d6e9e2;border-radius:999px;background:#f5fbf8;color:var(--brand-dark);font-size:8.5px;font-weight:800}
+.analysis-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:14px;margin-bottom:14px}
+.analysis-card{min-height:310px}
+.analysis-card.wide{grid-column:span 1}
+.analysis-card h3{margin-bottom:5px}
+.chart-box{position:relative;min-height:220px}
+.svg-chart{width:100%;height:230px;display:block;overflow:visible}
+.chart-gridline{stroke:#edf1ef;stroke-width:1}
+.chart-axis{stroke:#cbd7d2;stroke-width:1}
+.chart-label{font-size:9px;fill:#75817c}
+.chart-value{font-size:9px;font-weight:700;fill:#43514c}
+.chart-line-active{fill:none;stroke:var(--brand);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.chart-line-public{fill:none;stroke:var(--blue);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.chart-dot-active{fill:#fff;stroke:var(--brand);stroke-width:3}
+.chart-dot-public{fill:#fff;stroke:var(--blue);stroke-width:3}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+.legend-item{display:flex;align-items:center;gap:6px;color:#67736e;font-size:9px}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+.legend-dot.brand{background:var(--brand)}.legend-dot.blue{background:var(--blue)}
+.donut-wrap{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;min-height:220px}
+.donut{
+  width:150px;height:150px;border-radius:50%;position:relative;margin:auto;
+  background:conic-gradient(#e9eeec 0 100%)
+}
+.donut::after{
+  content:"";position:absolute;inset:25px;border-radius:50%;background:#fff;border:1px solid var(--line)
+}
+.donut-center{position:absolute;inset:0;display:grid;place-items:center;z-index:2;text-align:center;pointer-events:none}
+.donut-center b{font-size:24px;letter-spacing:-.04em}
+.donut-center span{display:block;margin-top:1px;color:var(--muted);font-size:8px}
+.donut-legend{display:flex;flex-direction:column;gap:8px}
+.donut-row{display:grid;grid-template-columns:10px 1fr auto;gap:7px;align-items:center;font-size:9px}
+.donut-row i{width:8px;height:8px;border-radius:3px}
+.donut-row b{font-size:9px}
+.mini-bars{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+.mini-bar-row{display:grid;grid-template-columns:70px 1fr 42px;gap:10px;align-items:center;font-size:9.5px}
+.mini-track{height:8px;border-radius:999px;background:#edf1ef;overflow:hidden}
+.mini-fill{height:100%;border-radius:999px;background:var(--brand)}
+.column-chart{height:220px;display:flex;align-items:end;gap:12px;padding:24px 8px 22px;border-bottom:1px solid var(--line);position:relative}
+.column-chart::before,.column-chart::after{content:"";position:absolute;left:0;right:0;border-top:1px dashed #edf1ef}
+.column-chart::before{top:33%}.column-chart::after{top:66%}
+.col-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;position:relative;z-index:1}
+.col-value{font-size:9px;font-weight:800;color:#53605b;margin-bottom:5px}
+.col-bar{width:min(44px,70%);min-height:2px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#79bda9,var(--brand))}
+.col-label{position:absolute;bottom:-18px;font-size:8.5px;color:#7a8580;white-space:nowrap}
 .panel{padding:19px}
 .panel h3{font-size:12px;margin:0 0 14px;font-weight:780;letter-spacing:-.01em}
 .sub{font-size:9.5px;color:var(--muted);margin-top:-8px;margin-bottom:18px}
@@ -185,7 +232,8 @@ tbody tr:hover{background:#fbfdfc}
 }
 @media(max-width:900px){
   .workspace{padding:0 14px 30px}.top{margin:0 -14px 18px;padding:12px 14px}
-  .stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:1fr 1fr}.analysis-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}
+  .donut-wrap{grid-template-columns:1fr}.analysis-head{align-items:flex-start;flex-direction:column}
 }
 @media(max-width:660px){
   .app-shell{display:block}.sidebar{display:none}.stats,.filters{grid-template-columns:1fr}
@@ -256,9 +304,47 @@ tbody tr:hover{background:#fbfdfc}
         <div class="card stat"><div class="label">Ort. karar süresi</div><div class="val" id="avgRt">0</div><div class="trend">saniye</div></div>
       </section>
 
-      <section class="grid" id="analyses">
-        <div class="card panel"><h3>Savunucu akran sayısına göre aktif savunma oranı</h3><div class="sub">Kritik kütle eğrisinin ilk görsel kontrolü</div><div id="bars"></div></div>
-        <div class="card panel"><h3>Davranış dağılımı</h3><div class="sub">Seçeneklere göre karar dağılımı</div><div id="distribution" class="dist"></div></div>
+      <section id="analyses">
+        <div class="analysis-head">
+          <div><h3>Analizler</h3><p>Görünür savunucu sayısının davranış üzerindeki etkisini farklı açılardan inceleyin.</p></div>
+          <div class="analysis-badge">Canlı veriden hesaplanır</div>
+        </div>
+
+        <div class="analysis-grid">
+          <div class="card panel analysis-card">
+            <h3>Kritik kütle eğrisi</h3>
+            <div class="sub">Savunucu sayısına göre aktif ve kamusal savunma oranı</div>
+            <div class="chart-box"><div id="criticalChart"></div></div>
+            <div class="chart-legend">
+              <span class="legend-item"><i class="legend-dot brand"></i>Aktif savunma</span>
+              <span class="legend-item"><i class="legend-dot blue"></i>Kamusal savunma</span>
+            </div>
+          </div>
+
+          <div class="card panel analysis-card">
+            <h3>Davranış dağılımı</h3>
+            <div class="sub">Tüm kararların seçeneklere göre dağılımı</div>
+            <div class="donut-wrap">
+              <div style="position:relative">
+                <div id="decisionDonut" class="donut"></div>
+                <div class="donut-center"><div><b id="donutTotal">0</b><span>karar</span></div></div>
+              </div>
+              <div id="donutLegend" class="donut-legend"></div>
+            </div>
+          </div>
+
+          <div class="card panel analysis-card">
+            <h3>Sınıf düzeyine göre kamusal savunma</h3>
+            <div class="sub">9–12. sınıflar arasındaki karşılaştırma</div>
+            <div id="gradeBars" class="mini-bars"></div>
+          </div>
+
+          <div class="card panel analysis-card">
+            <h3>Ortalama karar süresi</h3>
+            <div class="sub">Savunucu sayısına göre ortalama tepki süresi</div>
+            <div id="timeBars" class="column-chart"></div>
+          </div>
+        </div>
       </section>
 
       <section class="card panel" id="records">
@@ -358,16 +444,64 @@ function filtered(){
   const q=$("search").value.trim().toLowerCase(),gf=$("gradeFilter").value,df=$("defFilter").value,pf=$("phaseFilter").value;
   return rows.filter(r=>(!q||String(r.participant_code).toLowerCase().includes(q)||String(r.scenario_id).toLowerCase().includes(q))&&(!gf||String(r.grade)===gf)&&(!df||String(r.defender_count)===df)&&(!pf||String(r.study_phase)===pf))
 }
+function renderCriticalChart(f){
+  const W=620,H=230,pad={l:42,r:18,t:20,b:34};
+  const innerW=W-pad.l-pad.r,innerH=H-pad.t-pad.b;
+  const xs=n=>pad.l+(n/4)*innerW;
+  const ys=v=>pad.t+innerH-(Math.max(0,Math.min(100,v))/100)*innerH;
+  const active=[],publics=[];
+  for(let n=0;n<=4;n++){
+    const g=f.filter(r=>Number(r.defender_count)===n);
+    active.push(pct(g.filter(r=>r.decision_kind==="aktif").length,g.length));
+    publics.push(pct(g.filter(r=>r.decision==="public_defend").length,g.length));
+  }
+  const line=vals=>vals.map((v,i)=>`${xs(i)},${ys(v)}`).join(" ");
+  const grid=[0,25,50,75,100].map(v=>`<line class="chart-gridline" x1="${pad.l}" x2="${W-pad.r}" y1="${ys(v)}" y2="${ys(v)}"/><text class="chart-label" x="${pad.l-8}" y="${ys(v)+3}" text-anchor="end">${v}%</text>`).join("");
+  const labels=[0,1,2,3,4].map(n=>`<text class="chart-label" x="${xs(n)}" y="${H-10}" text-anchor="middle">${n} sav.</text>`).join("");
+  const dots=(vals,cls)=>vals.map((v,i)=>`<circle class="${cls}" cx="${xs(i)}" cy="${ys(v)}" r="4"/><text class="chart-value" x="${xs(i)}" y="${ys(v)-10}" text-anchor="middle">${v.toFixed(0)}%</text>`).join("");
+  $("criticalChart").innerHTML=`<svg class="svg-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Savunucu sayısına göre savunma oranları">${grid}<line class="chart-axis" x1="${pad.l}" x2="${W-pad.r}" y1="${ys(0)}" y2="${ys(0)}"/><polyline class="chart-line-active" points="${line(active)}"/><polyline class="chart-line-public" points="${line(publics)}"/>${dots(active,"chart-dot-active")}${dots(publics,"chart-dot-public")}${labels}</svg>`;
+}
+function renderDonut(f){
+  const ds=["support_aggressor","silent","private_support","public_defend","report"];
+  const colors=["#d9919f","#aab4b0","#f0b866","#0fa987","#4c7ee8"];
+  const values=ds.map(k=>f.filter(r=>r.decision===k).length);
+  const total=values.reduce((a,b)=>a+b,0);
+  $("donutTotal").textContent=total;
+  let cur=0,parts=[];
+  values.forEach((v,i)=>{const p=total?100*v/total:0;parts.push(`${colors[i]} ${cur}% ${cur+p}%`);cur+=p});
+  $("decisionDonut").style.background=total?`conic-gradient(${parts.join(",")})`:"#e9eeec";
+  $("donutLegend").innerHTML=ds.map((k,i)=>{
+    const p=total?100*values[i]/total:0;
+    return `<div class="donut-row"><i style="background:${colors[i]}"></i><span>${labelDecision(k)}</span><b>${p.toFixed(1)}%</b></div>`
+  }).join("");
+}
+function renderGradeBars(f){
+  $("gradeBars").innerHTML=[9,10,11,12].map(g=>{
+    const rowsG=f.filter(r=>Number(r.grade)===g),v=pct(rowsG.filter(r=>r.decision==="public_defend").length,rowsG.length);
+    return `<div class="mini-bar-row"><span>${g}. sınıf</span><div class="mini-track"><div class="mini-fill" style="width:${v}%"></div></div><b>${v.toFixed(0)}%</b></div>`
+  }).join("");
+}
+function renderTimeBars(f){
+  const vals=[0,1,2,3,4].map(n=>{
+    const g=f.filter(r=>Number(r.defender_count)===n);
+    return g.length?g.reduce((s,r)=>s+(+r.rt_ms||0),0)/g.length/1000:0;
+  });
+  const max=Math.max(1,...vals);
+  $("timeBars").innerHTML=vals.map((v,n)=>{
+    const h=Math.max(2,(v/max)*165);
+    return `<div class="col-item"><div class="col-value">${v.toFixed(1)} sn</div><div class="col-bar" style="height:${h}px"></div><div class="col-label">${n} sav.</div></div>`
+  }).join("");
+}
 function render(){
   const f=filtered(),sessions=new Set(f.map(r=>r.session_id)).size;
   $("participants").textContent=sessions;$("decisions").textContent=f.length;
   $("activePct").textContent=pct(f.filter(r=>r.decision_kind==="aktif").length,f.length).toFixed(1)+"%";
   $("publicPct").textContent=pct(f.filter(r=>r.decision==="public_defend").length,f.length).toFixed(1)+"%";
   $("avgRt").textContent=(f.length?f.reduce((s,r)=>s+(+r.rt_ms||0),0)/f.length/1000:0).toFixed(1);
-  $("bars").innerHTML="";
-  for(let n=0;n<=4;n++){const g=f.filter(r=>Number(r.defender_count)===n),v=pct(g.filter(r=>r.decision_kind==="aktif").length,g.length);const d=document.createElement("div");d.className="barrow";d.innerHTML=`<div>${n} savunucu</div><div class="bar"><i style="width:${v}%"></i></div><div>${v.toFixed(0)}%</div>`;$("bars").appendChild(d)}
-  const ds=["support_aggressor","silent","private_support","public_defend","report"];$("distribution").innerHTML="";
-  ds.forEach(k=>{const n=f.filter(r=>r.decision===k).length,v=pct(n,f.length);const d=document.createElement("div");d.className="dist-row";d.innerHTML=`<div><b>${labelDecision(k)}</b><small>${n} karar</small></div><div><b>${v.toFixed(1)}%</b></div><div class="dist-track"><i style="width:${v}%"></i></div>`;$("distribution").appendChild(d)});
+  renderCriticalChart(f);
+  renderDonut(f);
+  renderGradeBars(f);
+  renderTimeBars(f);
   $("tbody").innerHTML="";
   f.forEach(r=>{const tr=document.createElement("tr"),dt=r.created_at?new Date(r.created_at).toLocaleString("tr-TR"):"";tr.innerHTML=`<td>${r.participant_code}</td><td>${r.grade}</td><td>${r.scenario_id}</td><td>${r.order_no}</td><td>${r.defender_count}</td><td>${labelDecision(r.decision)}</td><td>${tag(r.decision_kind)}</td><td>${((+r.rt_ms||0)/1000).toFixed(1)} sn</td><td>${r.study_phase}</td><td>${dt}</td>`;$("tbody").appendChild(tr)})
 }
