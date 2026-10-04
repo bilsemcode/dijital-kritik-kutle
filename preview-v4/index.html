@@ -113,6 +113,16 @@ input,select{
 }
 input::placeholder{color:#a2aaa7}
 input:focus,select:focus{border-color:#8bcbbc;box-shadow:0 0 0 4px rgba(14,168,135,.09)}
+.auto-code-note{
+  display:flex;align-items:center;gap:10px;margin-top:14px;padding:11px 12px;
+  border:1px solid #d7ebe4;border-radius:10px;background:#f4fbf8;color:#46645a
+}
+.auto-code-note>span{
+  width:22px;height:22px;border-radius:7px;display:grid;place-items:center;
+  background:var(--brand-soft);color:var(--brand-dark);font-size:10px;font-weight:800
+}
+.auto-code-note b{display:block;font-size:10px}
+.auto-code-note small{display:block;margin-top:2px;color:#788681;font-size:9px}
 .checkrow{
   display:flex;gap:10px;align-items:flex-start;margin-top:18px;color:#68746f;
   font-size:10.5px;line-height:1.55;text-transform:none;letter-spacing:0;font-weight:500;
@@ -243,11 +253,11 @@ input:focus,select:focus{border-color:#8bcbbc;box-shadow:0 0 0 4px rgba(14,168,1
       <aside class="entry-panel">
         <div class="entry-index">DKK / Katılımcı oturumu</div>
         <h3>Oturumu başlat</h3>
-        <p>Size verilen katılımcı kodunu ve sınıf düzeyinizi girin.</p>
+        <p>Sınıf düzeyinizi seçin. Katılımcı kodunuz sistem tarafından otomatik ve benzersiz olarak atanacaktır.</p>
         <div class="form-grid">
-          <div><label for="pid">Katılımcı kodu</label><input id="pid" placeholder="Örn. P037" maxlength="20" autocomplete="off"></div>
           <div><label for="grade">Sınıf düzeyi</label><select id="grade"><option value="">Seçiniz</option><option>9</option><option>10</option><option>11</option><option>12</option></select></div>
         </div>
+        <div class="auto-code-note"><span>✓</span><div><b>Otomatik katılımcı kodu</b><small>P014, P015 … P099, P100, P101 şeklinde ilerler.</small></div></div>
         <label class="checkrow"><input id="pilotConfirm" type="checkbox"><span>Senaryoların kurgusal olduğunu ve seçimlerimin araştırma simülasyonu kapsamında kaydedileceğini anladım.</span></label>
         <div class="actions"><button class="btn primary" id="startBtn">Başla</button></div>
       </aside>
@@ -386,12 +396,37 @@ async function testConnection(){
 }
 window.addEventListener("online",flushPending);
 
-function startStudy(){
-  const pid=sanitizeCode($("pid").value)||("P"+Math.floor(1000+Math.random()*9000)),grade=$("grade").value;
+async function allocateParticipantCode(){
+  const res=await fetch(SUPABASE_URL+"/rest/v1/rpc/next_participant_code",{
+    method:"POST",
+    headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},
+    body:"{}"
+  });
+  if(!res.ok){
+    const detail=await res.text();
+    throw new Error("Katılımcı kodu oluşturulamadı. "+detail);
+  }
+  const data=await res.json();
+  if(typeof data!=="string"||!/^P\d+$/.test(data)) throw new Error("Geçersiz katılımcı kodu alındı.");
+  return data;
+}
+async function startStudy(){
+  const grade=$("grade").value;
   if(!grade){alert("Lütfen sınıf düzeyini seçin.");return}
   if(!$("pilotConfirm").checked){alert("Lütfen pilot uygulama bilgilendirmesini onaylayın.");return}
-  state.pid=pid;state.grade=grade;state.index=0;state.sessionRows=[];state.sessionId=uuid();
-  const rng=mulberry32(hashString(pid+"|"+state.sessionId));state.order=shuffle(scenarios,rng);show("studyScreen");renderScenario()
+  const btn=$("startBtn");
+  btn.disabled=true;btn.textContent="Kod atanıyor…";
+  try{
+    const pid=await allocateParticipantCode();
+    state.pid=pid;state.grade=grade;state.index=0;state.sessionRows=[];state.sessionId=uuid();
+    const rng=mulberry32(hashString(pid+"|"+state.sessionId));
+    state.order=shuffle(scenarios,rng);
+    show("studyScreen");renderScenario();
+  }catch(e){
+    alert(e.message);
+  }finally{
+    btn.disabled=false;btn.textContent="Başla";
+  }
 }
 function conditionFor(id){const off=hashString(state.pid)%5,n=parseInt(id.slice(1),10)-1;return(n+off)%5}
 function addMsg(who,text,cls){const d=document.createElement("div");d.className="msg "+cls;d.innerHTML=`<div class="who">${esc(who)}</div>${esc(text)}`;$("messages").appendChild(d)}
@@ -434,7 +469,9 @@ async function recordChoice(c,sc,dc){
 function finishStudy(){
   const r=state.sessionRows,active=r.filter(x=>x.decision_kind==="aktif").length,pub=r.filter(x=>x.decision==="public_defend").length,avg=r.length?r.reduce((s,x)=>s+x.rt_ms,0)/r.length/1000:0;
   $("doneN").textContent=r.length;$("doneActive").textContent=active;$("donePublic").textContent=pub;$("doneRT").textContent=avg.toFixed(1)+" sn";
-  $("doneText").textContent=readPending().length?"Katılımınız tamamlandı. Bağlantı kurulduğunda bekleyen kayıtlar otomatik gönderilecektir.":"Katılımınız için teşekkür ederiz. Yanıtlarınız merkezi araştırma veritabanına anonim katılımcı koduyla kaydedildi.";
+  $("doneText").textContent=readPending().length
+    ? "Katılımınız tamamlandı. Katılımcı kodunuz "+state.pid+". Bağlantı kurulduğunda bekleyen kayıtlar otomatik gönderilecektir."
+    : "Katılımınız için teşekkür ederiz. Katılımcı kodunuz "+state.pid+". Yanıtlarınız merkezi araştırma veritabanına kaydedildi.";
   show("doneScreen");flushPending()
 }
 $("startBtn").onclick=startStudy;$("newSessionBtn").onclick=()=>location.reload();
