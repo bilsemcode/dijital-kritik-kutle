@@ -235,8 +235,8 @@ input:focus,select:focus{border-color:#8bcbbc;box-shadow:0 0 0 4px rgba(14,168,1
           <p>Günlük dijital iletişimde karşılaşılabilecek kısa grup konuşmalarını inceleyin ve her durumda size en yakın davranışı seçin. Senaryolar kurgusaldır; gerçek kişi veya olayları temsil etmez.</p>
         </div>
         <div class="study-facts">
-          <div class="fact"><b>20</b><span>Kısa senaryo</span></div>
-          <div class="fact"><b>8–12</b><span>Dakika</span></div>
+          <div class="fact"><b>30</b><span>Kısa senaryo</span></div>
+          <div class="fact"><b>10–15</b><span>Dakika</span></div>
           <div class="fact"><b>Anonim</b><span>Katılım</span></div>
         </div>
       </div>
@@ -256,7 +256,7 @@ input:focus,select:focus{border-color:#8bcbbc;box-shadow:0 0 0 4px rgba(14,168,1
 </section>
 
 <section id="studyScreen" class="screen card study-card">
-  <div class="study-top"><div><strong>Dijital Grup İletişimi</strong><span id="progressText">Senaryo 1 / 20</span></div><div class="progress"><i id="progressFill"></i></div></div>
+  <div class="study-top"><div><strong>Dijital Grup İletişimi</strong><span id="progressText">Senaryo 1 / 30</span></div><div class="progress"><i id="progressFill"></i></div></div>
   <div class="study-body">
     <div class="phone"><div class="chat-head"><div class="room" id="roomName">Sınıf Grubu</div><div class="meta">Araştırma senaryosu</div></div><div class="messages" id="messages"></div></div>
     <div class="decision"><h3>Bu konuşmayı gördüğünde ne yapmayı tercih edersin?</h3><div class="choices" id="choices"></div><div id="saveNote" class="note">Tek bir seçenek işaretle.</div></div>
@@ -268,7 +268,7 @@ input:focus,select:focus{border-color:#8bcbbc;box-shadow:0 0 0 4px rgba(14,168,1
     <div class="done-icon">✓</div><h2>Uygulama tamamlandı</h2>
     <p id="doneText">Katılımınız için teşekkür ederiz. Yanıtlarınız anonim katılımcı koduyla kaydedildi.</p>
     <div class="stats">
-      <div class="stat"><b id="doneN">20</b><small>Tamamlanan senaryo</small></div>
+      <div class="stat"><b id="doneN">30</b><small>Tamamlanan senaryo</small></div>
       <div class="stat"><b id="doneActive">0</b><small>Aktif destek kararı</small></div>
       <div class="stat"><b id="donePublic">0</b><small>Grupta karşı çıkma</small></div>
       <div class="stat"><b id="doneRT">0</b><small>Ort. karar süresi</small></div>
@@ -286,28 +286,53 @@ const REST_URL=SUPABASE_URL+"/rest/v1/responses";
 const PENDING_KEY="dkk_pending_v3";
 
 const scenarios=[
-{id:"S01",room:"Sınıf Proje Grubu",pre:[["Duru","Sunum dosyasını akşam paylaşacağım."],["Emir","Ben görselleri hazırladım."]],aggr:["Kaan","Arda sen hiç uğraşma, zaten yaptığın her şeyi bozuyorsun."]},
-{id:"S02",room:"Sınıf Grubu",pre:[["Ece","Yarınki etkinlik için kimler geliyor?"],["Mert","Ben varım."]],aggr:["Deniz","Selin gelmese daha iyi, onunla uğraşmak istemiyoruz."]},
-{id:"S03",room:"Etüt Grubu",pre:[["Bora","Soruların 4. kısmını anlayamadım."],["Naz","Ben de biraz zorlandım."]],aggr:["Eren","Bora sen zaten hiçbir şeyi anlamıyorsun, boşuna uğraşma."]},
-{id:"S04",room:"Kulüp Grubu",pre:[["İpek","Afiş taslağını attım."],["Ada","Bence renkleri güzel olmuş."]],aggr:["Kerem","İpek'in yaptığı şeye bak, çocuk çizimi gibi olmuş."]},
-{id:"S05",room:"Sınıf Grubu",pre:[["Can","Maç için takım listesini yazalım."],["Ela","Ben kaleye geçebilirim."]],aggr:["Umut","Ozan'ı almayın, her maçta rezil ediyor bizi."]},
-{id:"S06",room:"Ödev Grubu",pre:[["Asya","Kaynakları paylaşabilir misiniz?"],["Doruk","Birazdan gönderirim."]],aggr:["Baran","Nehir yine hiçbir şey yapmadan not alacak herhalde."]},
-{id:"S07",room:"Gezi Grubu",pre:[["Melis","Cumartesi saat kaçta buluşuyoruz?"],["Aras","10 gibi olabilir."]],aggr:["Sarp","Mina gelmesin, her şeyi sıkıcı hale getiriyor."]},
-{id:"S08",room:"Sınıf Sohbeti",pre:[["Yağmur","Bugünkü soruyu kim çözdü?"],["Efe","Ben çözemedim."]],aggr:["Onur","Efe'nin çözememesi şaşırtmadı, sınıfın en tembeli zaten."]},
-{id:"S09",room:"Müzik Kulübü",pre:[["Lina","Prova videosunu yükledim."],["Mert","Dinledim, güzel olmuş."]],aggr:["Alp","Zeynep'in sesi yüzünden bütün kayıt kötü olmuş."]},
-{id:"S10",room:"Sınıf Grubu",pre:[["Sena","Kermes görevlerini paylaşalım."],["Toprak","Ben masada durabilirim."]],aggr:["Rüzgar","Beril'e görev vermeyin, yine yarıda bırakır."]},
-{id:"S11",room:"Proje Ekibi",pre:[["Nisa","Raporun girişini tamamladım."],["Ege","Ben de tabloyu düzenliyorum."]],aggr:["Kuzey","Mete'nin yazdığı kısmı silin, zaten okunmuyor."]},
-{id:"S12",room:"Sınıf Sohbeti",pre:[["Lara","Bugün fotoğrafları göndereceğim."],["Poyraz","Tamam bekliyoruz."]],aggr:["Doruk","Ayça fotoğraflarda yine çok komik çıkmış."]},
-{id:"S13",room:"Etkinlik Grubu",pre:[["İrem","Görev dağılımını yaptım."],["Eren","Bana da bakar mısın?"]],aggr:["Kaan","Mert'e önemli iş vermeyin, beceremiyor."]},
-{id:"S14",room:"Sınıf Grubu",pre:[["Deniz","Herkes sunum konusunu yazsın."],["Ece","Ben çevre konusunu aldım."]],aggr:["Arda","Sude ne anlatsa kimse dinlemiyor zaten."]},
-{id:"S15",room:"Spor Kulübü",pre:[["Berk","Antrenman 16.00'da."],["Selin","Tamam."]],aggr:["Emir","Ali gelmese takım daha iyi oynuyor."]},
-{id:"S16",room:"Kütüphane Grubu",pre:[["Dila","Kitap listesini paylaşayım mı?"],["Efe","Olur."]],aggr:["Naz","Cem yine anlamadığı kitaplar hakkında konuşacak."]},
-{id:"S17",room:"Sınıf Sohbeti",pre:[["Mina","Yarın erken gelecek var mı?"],["Kaan","Ben gelebilirim."]],aggr:["Umut","Duru gelmesin, onsuz daha rahatız."]},
-{id:"S18",room:"Proje Grubu",pre:[["Sarp","Grafikleri hazırladım."],["Ada","Eline sağlık."]],aggr:["Eren","Ozan'ın kısmı yine kötü, keşke grupta olmasa."]},
-{id:"S19",room:"Sınıf Grubu",pre:[["Zeynep","Notları gruba attım."],["Can","Teşekkürler."]],aggr:["Bora","Eylül zaten notları da anlamaz, boşuna gönderiyorsunuz."]},
-{id:"S20",room:"Etüt Sohbeti",pre:[["Aras","Yarın deneme çözecek miyiz?"],["İpek","Ben varım."]],aggr:["Kerem","Mert gelmesin, sürekli herkesi yavaşlatıyor."]}
+{id:"S01",group:"mixed",room:"11-A Sınıf Grubu",pre:[["Ece","Yarın okul çıkışı kafeye giden var mı?"],["Mert","Ben varım, 4 gibi çıkabiliriz."]],aggr:["Deniz","Selin'i çağırmayın ya, gelince ortamın tadı kaçıyor."]},
+{id:"S02",group:"mixed",room:"10-B Etüt Grubu",pre:[["Bora","Dördüncü soruyu böyle çözdüm, atıyorum."],["Naz","Benim çözüm biraz farklı."]],aggr:["Eren","Bora bunu ciddi ciddi doğru diye mi attın?"]},
+{id:"S03",group:"mixed",room:"Gezi Grubu",pre:[["Melis","Cumartesi AVM'ye kaçta geçiyoruz?"],["Aras","2 gibi buluşabiliriz."]],aggr:["Sarp","Mina gelmesin ya, her planı bozuyor."]},
+{id:"S04",group:"mixed",room:"Sınıf Story Grubu",pre:[["Duru","Sınıf fotosunu storye attım."],["Mert","Güzel olmuş bence."]],aggr:["Kaan","Ece'yi niye koydunuz, fotoğrafın havası gitmiş."]},
+{id:"S05",group:"mixed",room:"Matematik Grubu",pre:[["Arda","Matematik çözümünü gruba atıyorum."],["Ece","Ben sonra bakarım."]],aggr:["Bora","Arda bunu ciddi ciddi doğru diye mi attın?"]},
+{id:"S06",group:"mixed",room:"Sunum Grubu",pre:[["Nisa","Sunumun ilk taslağını yükledim."],["Ege","Akşam hep birlikte bakalım."]],aggr:["Kaan","Nisa'nın yaptığını kullanmayalım, yine çok kötü olmuş."]},
+{id:"S07",group:"mixed",room:"Kermes Grubu",pre:[["İrem","Kermeste kasa tarafında ben durabilirim."],["Can","Görevleri akşam netleştirelim."]],aggr:["Doruk","İrem'e kasa vermeyin, yine her şeyi karıştırır."]},
+{id:"S08",group:"mixed",room:"Okul Kulübü",pre:[["Kerem","Kulüp afişinin yeni halini attım."],["Ada","Renkler daha iyi olmuş."]],aggr:["Eren","Kerem'in yaptığını paylaşmayın, baya amatör duruyor."]},
+{id:"S09",group:"mixed",room:"Sınıf Sohbeti",pre:[["Yağmur","Bugünkü soruyu anlayan var mı?"],["Efe","Ben de çözemedim."]],aggr:["Onur","Efe'nin çözememesi şaşırtmadı zaten."]},
+{id:"S10",group:"mixed",room:"Doğum Günü Planı",pre:[["Zeynep","Doğum günü için kimler geliyor?"],["Can","Ben gelirim."]],aggr:["Duru","Mert'i çağırmasak daha iyi, ortam geriliyor."]},
+{id:"S11",group:"mixed",room:"Yakın Arkadaşlar",pre:[["Mina","Akşam Discord'a giriyor muyuz?"],["Aras","Ben 9 gibi girerim."]],aggr:["Umut","Duru gelmesin ya, onsuz daha rahat oluyor."]},
+{id:"S12",group:"mixed",room:"Mezuniyet Fotoğrafları",pre:[["Lara","Mezuniyet fotoğraflarını gruba attım."],["Poyraz","Birkaç tane çok iyi çıkmış."]],aggr:["Doruk","Ayça'nın olduğu fotoğrafları paylaşmayın, hepsini bozmuş."]},
+{id:"S13",group:"mixed",room:"Sınıf Sunum Grubu",pre:[["Deniz","Sunumda hangi konuyu seçelim?"],["Ece","Herkes bir öneri yazsın."]],aggr:["Arda","Sude'nin fikrini geçelim, zaten hep alakasız şeyler söylüyor."]},
+{id:"S14",group:"mixed",room:"Proje Grubu",pre:[["Ozan","Sonuç grafiğini dosyaya ekledim."],["Ada","Dosyada gördüm, birazdan bakarım."]],aggr:["Eren","Ozan'ınkini baştan yapalım, ondan düzgün iş çıkmıyor."]},
+{id:"S15",group:"mixed",room:"Müzik Kulübü",pre:[["Zeynep","Prova kaydını yükledim."],["Mert","Akşam dinleyelim."]],aggr:["Alp","Zeynep'in kısmını yine kayıttan çıkaralım, bütün ritmi bozuyor."]},
+{id:"S16",group:"girls",room:"Kız Voleybol Takımı",pre:[["Eylül","Yarınki maçta servis sırası aynı mı?"],["Duru","Hocanın attığı liste öyle."]],aggr:["İpek","Sude'yi ilk altıya yazmasak daha iyi, her topu kaçırıyor."]},
+{id:"S17",group:"girls",room:"Kızlar Buluşma Grubu",pre:[["Selin","Cumartesi kahveye gidelim mi?"],["Ece","Ben gelirim."]],aggr:["Duru","Melis'i çağırmayın ya, gelince bütün plan değişiyor."]},
+{id:"S18",group:"girls",room:"Kız Basketbol Takımı",pre:[["Zeynep","Antrenmandan sonra şut çalışalım mı?"],["Nisa","Ben kalırım."]],aggr:["Aylin","İrem kalmasa da olur, zaten takımı yavaşlatıyor."]},
+{id:"S19",group:"girls",room:"Kızlar Yakın Arkadaşlar",pre:[["Melis","Dün çektiğimiz videoyu yakın arkadaşlara attım."],["Sena","Ben beğendim."]],aggr:["İpek","Duru'nun olduğu kısmı keseydiniz, videoyu bozmuş."]},
+{id:"S20",group:"girls",room:"Kızlar Etkinlik Grubu",pre:[["Elif","Mezuniyet panosunu ben düzenleyebilirim."],["Buse","Fotoğrafları ben toplarım."]],aggr:["Ceren","Elif yapmasın, geçen seferki gibi çocukça olur."]},
+{id:"S21",group:"girls",room:"Kızlar Film Planı",pre:[["Ayça","Cuma film için kimler geliyor?"],["Nehir","Ben varım."]],aggr:["Dila","Sena'yı çağırmayın, her şeyde sorun çıkarıyor."]},
+{id:"S22",group:"boys",room:"Erkek Halı Saha Grubu",pre:[["Emir","Cumartesi halı saha için 8 kişi olduk."],["Berk","Kaleye kim geçecek?"]],aggr:["Kaan","Ozan gelmesin, geçen maç onun yüzünden gitti."]},
+{id:"S23",group:"boys",room:"Erkek Basketbol Takımı",pre:[["Mert","Yarın okuldan sonra basket var mı?"],["Arda","Ben gelirim."]],aggr:["Efe","Can'ı takıma almayın, topu her aldığında kaybediyor."]},
+{id:"S24",group:"boys",room:"Erkekler Oyun Ekibi",pre:[["Bora","Akşam turnuva için lobbyyi ben açarım."],["Emir","9'da gireriz."]],aggr:["Kerem","Arda'yı takıma almayın, her maç bizi düşürüyor."]},
+{id:"S25",group:"boys",room:"Erkek Futbol Takımı",pre:[["Can","Maç için forma listesini attım."],["Ege","Ben orta sahadayım."]],aggr:["Umut","Berk'i ilk 11'e yazmayın, sahada hiçbir şey yapmıyor."]},
+{id:"S26",group:"boys",room:"Erkekler Buluşma Grubu",pre:[["Mert","Pazar sahile giden var mı?"],["Efe","Ben varım."]],aggr:["Kaan","Emir'i çağırmayın, gelince ortam sıkıcı oluyor."]},
+{id:"S27",group:"boys",room:"Erkekler Turnuva Grubu",pre:[["Arda","Turnuva eşleşmeleri geldi."],["Bora","İlk maç 8'de."]],aggr:["Eren","Can oynamasın, yine bütün takımı rezil eder."]},
+{id:"S28",group:"mixed",room:"11-B Sınıf Grubu",pre:[["Zeynep","Biyoloji notlarını PDF yaptım, gruba atıyorum."],["Can","Teşekkürler."]],aggr:["Bora","Eylül'e atmayın boşuna, zaten yine anlamaz."]},
+{id:"S29",group:"mixed",room:"Okul Gezisi Grubu",pre:[["Aras","Gezi otobüsünde yerleri nasıl ayarlıyoruz?"],["İpek","Herkes istediği yere oturacakmış."]],aggr:["Kerem","Mert bizim tarafa oturmasın, bütün yolu çekemem."]},
+{id:"S30",group:"mixed",room:"Şenlik Grubu",pre:[["Sena","Şenlik için müzik listesini konuşalım mı?"],["Toprak","Herkes bir şey yazsın."]],aggr:["Rüzgar","Beril'in önerilerini geçelim, zevki hiç uymuyor."]}
 ];
-const defenderMessages=[["Aylin","Bence böyle konuşmak doğru değil."],["Mert","Birini gruptan dışlamayalım."],["Ece","Bu şekilde söylemek yerine sorunu normalce konuşabiliriz."],["Arda","Ben bu yoruma katılmıyorum, kırıcı olmuş."]];
+const defenderNames={
+  mixed:["Aylin","Mert","Ece","Arda","Can","Duru","İrem","Bora","Nisa","Ege"],
+  girls:["Aylin","Ece","Duru","Selin","İpek","Melis","Nisa","Zeynep","Sena","Elif"],
+  boys:["Mert","Arda","Efe","Can","Berk","Emir","Bora","Kerem","Ege","Umut"]
+};
+const defenderTexts=[
+  "Bence böyle konuşmak doğru değil.",
+  "Ben de katılıyorum, bu yorum kırıcı olmuş.",
+  "Kişiyi hedef almadan konuşabiliriz.",
+  "Evet, böyle devam etmeyelim."
+];
+function getDefenderMessages(sc){
+  const used=new Set([...sc.pre.map(x=>x[0]),sc.aggr[0]]);
+  const pool=(defenderNames[sc.group]||defenderNames.mixed).filter(name=>!used.has(name));
+  return defenderTexts.map((text,i)=>[pool[i],text]);
+}
 const choices=[
 {id:"support_aggressor",title:"Saldırgan yorumu desteklerim",desc:"Gülme/like gibi bir tepki veririm.",kind:"destek"},
 {id:"silent",title:"Sessiz kalırım",desc:"Konuşmaya müdahale etmem.",kind:"pasif"},
@@ -374,7 +399,7 @@ function setChoicesDisabled(v){document.querySelectorAll(".choice").forEach(b=>b
 function renderScenario(){
   state.busy=false;const sc=state.order[state.index],dc=conditionFor(sc.id);
   $("roomName").textContent=sc.room;$("progressText").textContent=`Senaryo ${state.index+1} / ${state.order.length}`;$("progressFill").style.width=((state.index/state.order.length)*100)+"%";
-  $("messages").innerHTML="";sc.pre.forEach(([w,t])=>addMsg(w,t,"other"));addMsg(sc.aggr[0],sc.aggr[1],"aggr");for(let i=0;i<dc;i++)addMsg(defenderMessages[i][0],defenderMessages[i][1],"def");
+  $("messages").innerHTML="";sc.pre.forEach(([w,t])=>addMsg(w,t,"other"));addMsg(sc.aggr[0],sc.aggr[1],"aggr");const defenders=getDefenderMessages(sc);for(let i=0;i<dc;i++)addMsg(defenders[i][0],defenders[i][1],"def");
   $("choices").innerHTML="";choices.forEach(c=>{const b=document.createElement("button");b.className="choice";b.innerHTML=`<b>${esc(c.title)}</b><small>${esc(c.desc)}</small>`;b.onclick=()=>recordChoice(c,sc,dc);$("choices").appendChild(b)});
   $("saveNote").textContent="Tek bir seçenek işaretle.";state.startedAt=performance.now()
 }
@@ -392,7 +417,7 @@ async function recordChoice(c,sc,dc){
     decision_kind:c.kind,
     rt_ms:rt,
     study_phase:"pilot",
-    app_version:"v3.1",
+    app_version:"v4.30",
     client_timestamp:new Date().toISOString()
   };
   state.sessionRows.push(row);
