@@ -75,7 +75,8 @@ input:focus,select:focus{border-color:#87c9b8;box-shadow:0 0 0 4px rgba(15,169,1
 }
 .side-link svg{width:15px;height:15px;stroke-width:1.8;opacity:.9}
 .side-link.active{background:rgba(255,255,255,.09);color:#fff;border-color:rgba(255,255,255,.06)}
-.side-link:hover{background:rgba(255,255,255,.06)}\n#overview,#analyses,#records{scroll-margin-top:86px}
+.side-link:hover{background:rgba(255,255,255,.06)}
+#overview,#analyses,#records{scroll-margin-top:86px}
 .side-foot{margin-top:auto;padding:14px 9px 2px;border-top:1px solid rgba(255,255,255,.08);color:#78978d;font-size:8.5px;line-height:1.5}
 .workspace{min-width:0;padding:0 28px 42px}
 .top{
@@ -333,7 +334,8 @@ function downloadCSV(){
 $("login").onclick=async()=>{try{$("loginError").textContent="Giriş yapılıyor…";await signIn($("email").value.trim(),$("password").value);$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");$("loginError").textContent="";await fetchRows()}catch(e){$("loginError").textContent=e.message}};
 $("refresh").onclick=()=>fetchRows().catch(e=>alert(e.message));$("download").onclick=downloadCSV;$("logout").onclick=logout;
 ["search","gradeFilter","defFilter","phaseFilter"].forEach(id=>$(id).addEventListener("input",render));
-initSidebarNavigation();\nif(accessToken){$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");fetchRows().catch(()=>logout())}
+initSidebarNavigation();
+if(accessToken){$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");fetchRows().catch(()=>logout())}
 </script>
 </body>
 </html>
