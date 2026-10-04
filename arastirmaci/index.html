@@ -4,32 +4,200 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Araştırmacı Paneli — Dijital Kritik Kütle</title>
+
 <style>
 :root{
-  --bg:#f5f7fb;--paper:#fff;--ink:#263247;--muted:#707c92;--line:#e4e9f1;
-  --blue:#7ba5f2;--blue2:#edf4ff;--lav:#a895e8;--lav2:#f3efff;--mint:#7bc5ae;--mint2:#edf9f5;
-  --red:#db7d87;--shadow:0 18px 50px rgba(63,79,118,.10)
+  --bg:#f7f9f8;
+  --surface:#ffffff;
+  --surface-soft:#f4f8f6;
+  --ink:#17211e;
+  --muted:#6f7a76;
+  --line:#dfe7e4;
+  --line-2:#edf1ef;
+  --sidebar:#102a24;
+  --sidebar-2:#17372f;
+  --brand:#0fa987;
+  --brand-dark:#0b7e69;
+  --brand-soft:#e8f7f2;
+  --blue:#4c7ee8;
+  --blue-soft:#edf3ff;
+  --amber:#e99e43;
+  --amber-soft:#fff3e2;
+  --rose:#c77284;
+  --rose-soft:#fbeef2;
+  --shadow:0 10px 26px rgba(31,65,55,.06);
 }
-*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(180deg,#fafbfe,#f4f6fb);color:var(--ink);min-height:100vh}
-button,input,select{font:inherit}.wrap{max-width:1240px;margin:0 auto;padding:22px 18px 44px}.card{background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
-.gate{max-width:490px;margin:75px auto;padding:29px}.gate h1{font-size:24px;margin:8px 0}.gate p{color:var(--muted);line-height:1.6}.kicker{display:inline-flex;background:var(--lav2);color:#705eb2;border:1px solid #e5dcff;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800}
-label{display:block;font-size:12px;font-weight:800;color:#5d6b83;margin:16px 0 7px}input,select{width:100%;border:1px solid #dfe5ee;background:#fff;color:var(--ink);padding:12px 13px;border-radius:12px;outline:none}
-input:focus,select:focus{border-color:#a8bff0;box-shadow:0 0 0 4px rgba(123,165,242,.12)}.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:850;cursor:pointer}.btn.primary{color:#fff;background:linear-gradient(135deg,#7da7f1,#9287db)}.btn.ghost{background:#fff;border:1px solid var(--line);color:#5c6980}.hidden{display:none!important}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#8db5f5,#b0a1e8);display:grid;place-items:center;color:#fff;font-weight:900}
-.brand h1{font-size:18px;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:12px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.hero{padding:22px;margin-bottom:16px;background:linear-gradient(135deg,#ffffff,#fafaff)}
-.hero h2{font-size:22px;margin:0 0 6px}.hero p{color:var(--muted);margin:0;line-height:1.55;font-size:13px}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}.stat{padding:16px}.stat .label{font-size:11px;color:var(--muted);font-weight:800}.stat .val{font-size:25px;font-weight:900;margin-top:5px}.stat .trend{font-size:10px;margin-top:3px;color:#8793a6}
-.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-bottom:16px}.panel{padding:18px}.panel h3{font-size:14px;margin:0 0 14px}.sub{font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:13px}.barrow{display:grid;grid-template-columns:92px 1fr 54px;gap:10px;align-items:center;margin:11px 0;font-size:12px}.bar{height:11px;background:#eef1f6;border-radius:999px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#7ba8f1,#a996e5)}
-.dist{display:flex;flex-direction:column;gap:10px}.dist-row{display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:center}.dist-row b{font-size:12px}.dist-row small{color:var(--muted);font-size:10px}.filters{display:grid;grid-template-columns:1fr 180px 180px 160px;gap:10px;margin-bottom:12px}.tablewrap{overflow:auto;max-height:500px;border:1px solid var(--line);border-radius:13px}
-table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:10px;border-bottom:1px solid #edf0f5;text-align:left;white-space:nowrap}th{position:sticky;top:0;background:#f8faff;color:#6c7890;z-index:1}td{color:#3e4a60}.tag{padding:4px 7px;border-radius:999px;font-size:10px;font-weight:800}.tag.active{background:var(--mint2);color:#4f967f}.tag.passive{background:#f3f5f8;color:#6f7c90}.tag.support{background:#fff1f2;color:#b86871}
-.notice{padding:12px 14px;background:#eef7ff;border:1px solid #d7e8fa;color:#55718d;border-radius:12px;font-size:11px;line-height:1.5;margin-top:14px}.err{color:#b85e68;font-size:12px;min-height:18px;margin-top:8px}
-@media(max-width:900px){.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.wrap{padding:14px 10px 30px}.top{align-items:flex-start;flex-direction:column}}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;color:var(--ink);background:var(--bg);
+  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+button,input,select{font:inherit}
+.wrap{max-width:none;margin:0;padding:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.gate{
+  max-width:440px;margin:9vh auto 0;padding:34px;background:#fff;color:var(--ink);
+  border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 50px rgba(26,69,56,.10)
+}
+.gate h1{font-size:30px;letter-spacing:-.04em;margin:16px 0 8px}
+.gate p{margin:0 0 26px;color:var(--muted);line-height:1.65;font-size:12px}
+.kicker{display:inline-flex;color:var(--brand-dark);font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+label{display:block;margin:16px 0 6px;color:#5d6965;font-size:9px;font-weight:760;letter-spacing:.07em;text-transform:uppercase}
+input,select{
+  width:100%;padding:11px 12px;border:1px solid #d4dfdb;border-radius:9px;outline:none;
+  background:#fff;color:var(--ink)
+}
+.gate input{background:#fff;color:var(--ink);border-color:#d4dfdb}
+input:focus,select:focus{border-color:#87c9b8;box-shadow:0 0 0 4px rgba(15,169,135,.08)}
+.btn{border:1px solid transparent;border-radius:9px;padding:10px 13px;font-weight:730;cursor:pointer;transition:.15s}
+.btn.primary{color:#fff;background:var(--brand);box-shadow:0 7px 16px rgba(15,169,135,.15)}
+.btn.primary:hover{background:#0b987b}
+.btn.ghost{background:#fff;border-color:var(--line);color:#4f5c57}
+.btn.danger{background:#fff;color:#a75c6b;border-color:#efd7dd}
+.btn.danger:hover{background:#fff7f8;border-color:#e7c5ce}
+.side-link.danger-link{color:#e2adb8}
+.side-link.danger-link:hover{background:rgba(199,114,132,.12);color:#ffd2da}
+.hidden{display:none!important}
+.reset-modal{
+  position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;
+  background:rgba(9,24,20,.42);backdrop-filter:blur(5px)
+}
+.reset-dialog{
+  width:min(470px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;
+  padding:24px;box-shadow:0 26px 70px rgba(18,42,35,.20)
+}
+.reset-icon{
+  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  background:var(--rose-soft);color:#a85f6e;margin-bottom:15px
+}
+.reset-dialog h3{margin:0 0 8px;font-size:20px;letter-spacing:-.025em}
+.reset-dialog p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.65}
+.reset-warning{
+  margin:16px 0;padding:12px 13px;border:1px solid #efd8dd;border-radius:10px;
+  background:#fff8f9;color:#85515c;font-size:10.5px;line-height:1.55
+}
+.reset-dialog label{color:#66716d;margin-top:15px}
+.reset-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.reset-status{min-height:16px;margin-top:10px;color:#a75c6b;font-size:10px}
+#confirmReset:disabled{opacity:.45;cursor:not-allowed}
+
+.app-shell{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:100vh}
+.sidebar{
+  position:sticky;top:0;height:100vh;background:var(--sidebar);color:#fff;padding:22px 15px;
+  display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.04)
+}
+.side-brand{display:flex;align-items:center;gap:11px;padding:0 6px 22px;border-bottom:1px solid rgba(255,255,255,.08)}
+.side-logo{
+  width:38px;height:38px;border-radius:12px;background:var(--brand);display:grid;place-items:center;
+  font-size:10px;font-weight:800;letter-spacing:.06em;color:#fff
+}
+.side-brand b{display:block;font-size:13px}.side-brand span{display:block;margin-top:3px;color:#8fa9a1;font-size:9px}
+.side-label{margin:23px 9px 9px;color:#718e85;font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.side-nav{display:flex;flex-direction:column;gap:5px}
+.side-link{
+  display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:9px;color:#c6d5d0;
+  font-size:10.5px;font-weight:650;text-decoration:none;border:1px solid transparent;
+}
+.side-link svg{width:15px;height:15px;stroke-width:1.8;opacity:.9}
+.side-link.active{background:rgba(255,255,255,.09);color:#fff;border-color:rgba(255,255,255,.06)}
+.side-link:hover{background:rgba(255,255,255,.06)}
+#overview,#analyses,#records{scroll-margin-top:86px}
+.side-foot{margin-top:auto;padding:14px 9px 2px;border-top:1px solid rgba(255,255,255,.08);color:#78978d;font-size:8.5px;line-height:1.5}
+.workspace{min-width:0;padding:0 28px 42px}
+.top{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  margin:0 -28px 24px;padding:15px 28px;background:rgba(247,249,248,.92);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--line)
+}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{
+  width:34px;height:34px;border-radius:10px;background:var(--brand-soft);display:grid;place-items:center;
+  color:var(--brand-dark);font-size:9px;font-weight:800;letter-spacing:.05em
+}
+.brand h1{font-size:13px;margin:0;font-weight:770}.brand p{margin:3px 0 0;color:var(--muted);font-size:9.5px}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap}
+.hero{
+  display:flex;align-items:end;justify-content:space-between;gap:30px;padding:10px 0 22px;margin-bottom:18px;
+  background:transparent;border:0;border-radius:0
+}
+.hero::after{
+  content:"Canlı veri bağlantısı";flex:0 0 auto;padding:7px 10px;border:1px solid #cde7df;border-radius:999px;
+  color:var(--brand-dark);background:#f4fbf8;font-size:8.5px;font-weight:800;letter-spacing:.02em
+}
+.hero h2{font-size:32px;letter-spacing:-.045em;margin:0 0 7px;font-weight:760}
+.hero p{max-width:760px;color:var(--muted);margin:0;line-height:1.6;font-size:11.5px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.stat{padding:17px 17px 16px;position:relative;overflow:hidden}
+.stat::after{
+  content:"";position:absolute;right:15px;top:15px;width:32px;height:32px;border-radius:10px;background:#eff5f3
+}
+.stat:nth-child(1)::after{background:var(--brand-soft)}
+.stat:nth-child(2)::after{background:var(--blue-soft)}
+.stat:nth-child(3)::after{background:var(--amber-soft)}
+.stat:nth-child(4)::after{background:#eef8f5}
+.stat:nth-child(5)::after{background:var(--rose-soft)}
+.stat .label{font-size:9px;color:#74807b;font-weight:720;letter-spacing:.025em}
+.stat .val{font-size:29px;font-weight:780;margin-top:24px;letter-spacing:-.05em}
+.stat:nth-child(1) .val{color:var(--brand)}
+.stat:nth-child(2) .val{color:var(--blue)}
+.stat:nth-child(3) .val{color:#d98418}
+.stat:nth-child(4) .val{color:var(--brand-dark)}
+.stat:nth-child(5) .val{color:var(--rose)}
+.stat .trend{font-size:9px;margin-top:5px;color:#909995}
+.grid{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(320px,.78fr);gap:14px;margin-bottom:14px}
+.panel{padding:19px}
+.panel h3{font-size:12px;margin:0 0 14px;font-weight:780;letter-spacing:-.01em}
+.sub{font-size:9.5px;color:var(--muted);margin-top:-8px;margin-bottom:18px}
+.barrow{display:grid;grid-template-columns:98px 1fr 46px;gap:11px;align-items:center;margin:14px 0;font-size:10.5px}
+.bar{height:6px;background:#edf1ef;border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--brand);border-radius:999px}
+.dist{display:flex;flex-direction:column;gap:11px}
+.dist-row{display:grid;grid-template-columns:1fr 54px;gap:10px;align-items:center}
+.dist-row b{font-size:10.5px}.dist-row small{display:block;color:var(--muted);font-size:8.7px;margin-top:3px}
+.dist-track{grid-column:1/-1;height:4px;margin-top:-5px;background:#eff2f1;border-radius:999px;overflow:hidden}
+.dist-track i{display:block;height:100%;background:#98aaa4;border-radius:999px}
+.filters{display:grid;grid-template-columns:1fr 165px 190px 145px;gap:8px;margin-bottom:10px}
+.filters input,.filters select{font-size:10.5px;background:#fff}
+.tablewrap{overflow:auto;max-height:540px;border:1px solid var(--line);border-radius:10px;background:#fff}
+table{width:100%;border-collapse:collapse;font-size:10px}
+th,td{padding:10px 11px;border-bottom:1px solid var(--line-2);text-align:left;white-space:nowrap}
+th{
+  position:sticky;top:0;z-index:1;background:#f7faf8;color:#68756f;
+  font-size:8.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:800
+}
+td{color:#37443f}
+tbody tr:hover{background:#fbfdfc}
+.tag{display:inline-block;padding:3px 6px;border-radius:999px;font-size:8.5px;font-weight:760}
+.tag.active{background:var(--brand-soft);color:var(--brand-dark)}
+.tag.passive{background:#f0f2f1;color:#6f7975}
+.tag.support{background:var(--rose-soft);color:#a25e6b}
+.notice{
+  padding:10px 0 0;border:0;border-top:1px solid var(--line);background:transparent;color:#858f8b;
+  border-radius:0;font-size:8.8px;line-height:1.55;margin-top:12px
+}
+.err{color:#b96676;font-size:10.5px;min-height:18px;margin-top:8px}
+@media(max-width:1080px){
+  .app-shell{grid-template-columns:72px minmax(0,1fr)}
+  .side-brand b,.side-brand span,.side-label,.side-link span,.side-foot{display:none}
+  .sidebar{padding:18px 10px}.side-brand{justify-content:center;padding:0 0 18px}.side-link{justify-content:center;padding:11px}
+}
+@media(max-width:900px){
+  .workspace{padding:0 14px 30px}.top{margin:0 -14px 18px;padding:12px 14px}
+  .stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}
+}
+@media(max-width:660px){
+  .app-shell{display:block}.sidebar{display:none}.stats,.filters{grid-template-columns:1fr}
+  .top{align-items:flex-start;flex-direction:column}.hero{align-items:flex-start;flex-direction:column}.hero h2{font-size:29px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
 <section id="gate" class="card gate">
-  <span class="kicker">Araştırmacı erişimi</span><h1>Dijital Kritik Kütle</h1>
-  <p>Merkezi araştırma veritabanına erişmek için Supabase araştırmacı hesabınızla giriş yapın.</p>
+  <span class="kicker">DKK / Güvenli erişim</span><h1>Araştırmacı girişi</h1>
+  <p>Araştırma verilerine yalnızca yetkilendirilmiş araştırmacı hesabı ile erişilebilir.</p>
   <label for="email">E-posta</label><input id="email" type="email" autocomplete="username" placeholder="arastirmaci@...">
   <label for="password">Parola</label><input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
   <div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary" id="login">Panele Gir</button></div>
@@ -37,33 +205,91 @@ table{width:100%;border-collapse:collapse;font-size:11px}th,td{padding:10px;bord
 </section>
 
 <main id="dashboard" class="hidden">
-  <div class="top">
-    <div class="brand"><div class="logo">DK</div><div><h1>Araştırmacı Paneli</h1><p>Dijital Kritik Kütle • Merkezi veri görünümü</p></div></div>
-    <div class="toolbar"><button class="btn ghost" id="refresh">Yenile</button><button class="btn primary" id="download">CSV İndir</button><button class="btn ghost" id="logout">Çıkış</button></div>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="side-brand">
+        <div class="side-logo">DK</div>
+        <div><b>Dijital Kritik Kütle</b><span>Araştırma sistemi</span></div>
+      </div>
+      <div class="side-label">Araştırma</div>
+      <nav class="side-nav">
+        <a class="side-link active" href="#overview" data-target="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Genel Görünüm</span>
+        </a>
+        <a class="side-link" href="#analyses" data-target="analyses">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M7 15l4-4 3 2 5-6"/></svg>
+          <span>Analizler</span>
+        </a>
+        <a class="side-link" href="#records" data-target="records">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 3h12v18H6z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+          <span>Karar Kayıtları</span>
+        </a>
+      </nav>
+      <div class="side-label">Veri</div>
+      <nav class="side-nav">
+        <a class="side-link" href="#" id="sideDownload" onclick="document.getElementById('download').click();return false;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          <span>CSV Dışa Aktar</span>
+        </a>
+        <a class="side-link danger-link" href="#" id="resetData">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 15H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>
+          <span>Verileri Sıfırla</span>
+        </a>
+      </nav>
+      <div class="side-foot">TÜBİTAK 2204-A<br>Merkezi veri görünümü</div>
+    </aside>
+
+    <section class="workspace">
+      <div class="top">
+        <div class="brand"><div class="logo">DK</div><div><h1>Araştırmacı Paneli</h1><p>Dijital Kritik Kütle · 2204-A</p></div></div>
+        <div class="toolbar"><button class="btn ghost" id="refresh">Yenile</button><button class="btn primary" id="download">CSV İndir</button><button class="btn ghost" id="logout">Çıkış</button></div>
+      </div>
+
+      <section class="hero" id="overview"><div><h2>Araştırma görünümü</h2><p>Katılımcı oturumları, davranış dağılımları ve savunucu düzeylerine göre sonuçların merkezi görünümü.</p></div></section>
+
+      <section class="stats">
+        <div class="card stat"><div class="label">Katılımcı</div><div class="val" id="participants">0</div><div class="trend">benzersiz oturum</div></div>
+        <div class="card stat"><div class="label">Toplam karar</div><div class="val" id="decisions">0</div><div class="trend">senaryo yanıtı</div></div>
+        <div class="card stat"><div class="label">Aktif savunma</div><div class="val" id="activePct">0%</div><div class="trend">tüm kararlar içinde</div></div>
+        <div class="card stat"><div class="label">Kamusal savunma</div><div class="val" id="publicPct">0%</div><div class="trend">grupta açık karşı çıkma</div></div>
+        <div class="card stat"><div class="label">Ort. karar süresi</div><div class="val" id="avgRt">0</div><div class="trend">saniye</div></div>
+      </section>
+
+      <section class="grid" id="analyses">
+        <div class="card panel"><h3>Savunucu akran sayısına göre aktif savunma oranı</h3><div class="sub">Kritik kütle eğrisinin ilk görsel kontrolü</div><div id="bars"></div></div>
+        <div class="card panel"><h3>Davranış dağılımı</h3><div class="sub">Seçeneklere göre karar dağılımı</div><div id="distribution" class="dist"></div></div>
+      </section>
+
+      <section class="card panel" id="records">
+        <h3>Karar kayıtları</h3>
+        <div class="filters">
+          <input id="search" placeholder="Katılımcı veya senaryo ara">
+          <select id="gradeFilter"><option value="">Tüm sınıflar</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
+          <select id="defFilter"><option value="">Tüm savunucu düzeyleri</option><option value="0">0 savunucu</option><option value="1">1 savunucu</option><option value="2">2 savunucu</option><option value="3">3 savunucu</option><option value="4">4 savunucu</option></select>
+          <select id="phaseFilter"><option value="pilot">Pilot</option><option value="main">Ana çalışma</option><option value="">Tümü</option></select>
+        </div>
+        <div class="tablewrap"><table><thead><tr><th>Katılımcı</th><th>Sınıf</th><th>Senaryo</th><th>Sıra</th><th>Savunucu</th><th>Karar</th><th>Tür</th><th>Süre</th><th>Aşama</th><th>Zaman</th></tr></thead><tbody id="tbody"></tbody></table></div>
+        <div class="notice">Araştırmacı erişimi Supabase Auth ile yapılır. GitHub'a yalnızca publishable key konur; secret/service_role key istemci koduna eklenmez.</div>
+      </section>
+    </section>
   </div>
-  <section class="card hero"><h2>Genel Araştırma Özeti</h2><p>Bu panel Supabase merkezi veritabanındaki yanıtları gösterir. Pilot ve ana çalışma verileri birbirinden ayrılmıştır.</p></section>
-  <section class="stats">
-    <div class="card stat"><div class="label">KATILIMCI</div><div class="val" id="participants">0</div><div class="trend">benzersiz oturum</div></div>
-    <div class="card stat"><div class="label">TOPLAM KARAR</div><div class="val" id="decisions">0</div><div class="trend">senaryo yanıtı</div></div>
-    <div class="card stat"><div class="label">AKTİF SAVUNMA</div><div class="val" id="activePct">0%</div><div class="trend">tüm kararlar içinde</div></div>
-    <div class="card stat"><div class="label">KAMUSAL SAVUNMA</div><div class="val" id="publicPct">0%</div><div class="trend">grupta açık karşı çıkma</div></div>
-    <div class="card stat"><div class="label">ORT. KARAR SÜRESİ</div><div class="val" id="avgRt">0</div><div class="trend">saniye</div></div>
-  </section>
-  <section class="grid">
-    <div class="card panel"><h3>Savunucu akran sayısına göre aktif savunma oranı</h3><div class="sub">Kritik kütle eğrisinin ilk görsel kontrolü</div><div id="bars"></div></div>
-    <div class="card panel"><h3>Davranış dağılımı</h3><div class="sub">Seçeneklere göre karar dağılımı</div><div id="distribution" class="dist"></div></div>
-  </section>
-  <section class="card panel">
-    <h3>Karar kayıtları</h3>
-    <div class="filters">
-      <input id="search" placeholder="Katılımcı veya senaryo ara">
-      <select id="gradeFilter"><option value="">Tüm sınıflar</option><option>9</option><option>10</option><option>11</option><option>12</option></select>
-      <select id="defFilter"><option value="">Tüm savunucu düzeyleri</option><option value="0">0 savunucu</option><option value="1">1 savunucu</option><option value="2">2 savunucu</option><option value="3">3 savunucu</option><option value="4">4 savunucu</option></select>
-      <select id="phaseFilter"><option value="pilot">Pilot</option><option value="main">Ana çalışma</option><option value="">Tümü</option></select>
+
+  <div id="resetModal" class="reset-modal hidden" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+    <div class="reset-dialog">
+      <div class="reset-icon">!</div>
+      <h3 id="resetTitle">Tüm araştırma verileri silinsin mi?</h3>
+      <p>Bu işlem Supabase'deki <b>tüm pilot ve ana çalışma yanıtlarını</b> kalıcı olarak siler. Paneldeki göstergeler, grafikler ve karar kayıtları sıfırlanır; bundan sonra indirilecek CSV boş olur.</p>
+      <div class="reset-warning"><b>Geri alınamaz.</b> Daha önce bilgisayarınıza indirdiğiniz CSV dosyaları cihazınızdan otomatik olarak silinmez.</div>
+      <label for="resetPhrase">Onaylamak için SIFIRLA yazın</label>
+      <input id="resetPhrase" autocomplete="off" placeholder="SIFIRLA">
+      <div id="resetStatus" class="reset-status"></div>
+      <div class="reset-actions">
+        <button class="btn ghost" id="cancelReset">Vazgeç</button>
+        <button class="btn danger" id="confirmReset" disabled>Tüm Verileri Sil</button>
+      </div>
     </div>
-    <div class="tablewrap"><table><thead><tr><th>Katılımcı</th><th>Sınıf</th><th>Senaryo</th><th>Sıra</th><th>Savunucu</th><th>Karar</th><th>Tür</th><th>Süre</th><th>Aşama</th><th>Zaman</th></tr></thead><tbody id="tbody"></tbody></table></div>
-    <div class="notice">Araştırmacı erişimi Supabase Auth ile yapılır. GitHub'a yalnızca publishable key konur; secret/service_role key hiçbir zaman istemci koduna eklenmez.</div>
-  </section>
+  </div>
 </main>
 </div>
 
@@ -73,6 +299,39 @@ const SUPABASE_KEY="sb_publishable_-fHeoH2uk6W4NZvSpirgOQ_hdrWzCn3";
 const $=id=>document.getElementById(id);
 let accessToken=sessionStorage.getItem("dkk_access_token")||"";
 let rows=[];
+
+
+function initSidebarNavigation(){
+  const links=[...document.querySelectorAll('.side-link[data-target]')];
+  const targets=links.map(link=>document.getElementById(link.dataset.target)).filter(Boolean);
+  const activate=(id)=>{
+    links.forEach(link=>link.classList.toggle('active',link.dataset.target===id));
+  };
+  links.forEach(link=>{
+    link.addEventListener('click',e=>{
+      e.preventDefault();
+      const id=link.dataset.target;
+      activate(id);
+      if(id==='overview'){
+        window.scrollTo({top:0,behavior:'smooth'});
+      }else{
+        document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    });
+  });
+  const updateActive=()=>{
+    if(window.scrollY<180){activate('overview');return}
+    let current='overview';
+    for(const target of targets){
+      if(target.id==='overview') continue;
+      const rect=target.getBoundingClientRect();
+      if(rect.top<=140) current=target.id;
+    }
+    activate(current);
+  };
+  window.addEventListener('scroll',updateActive,{passive:true});
+  updateActive();
+}
 
 async function signIn(email,password){
   const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{
@@ -108,11 +367,59 @@ function render(){
   $("bars").innerHTML="";
   for(let n=0;n<=4;n++){const g=f.filter(r=>Number(r.defender_count)===n),v=pct(g.filter(r=>r.decision_kind==="aktif").length,g.length);const d=document.createElement("div");d.className="barrow";d.innerHTML=`<div>${n} savunucu</div><div class="bar"><i style="width:${v}%"></i></div><div>${v.toFixed(0)}%</div>`;$("bars").appendChild(d)}
   const ds=["support_aggressor","silent","private_support","public_defend","report"];$("distribution").innerHTML="";
-  ds.forEach(k=>{const n=f.filter(r=>r.decision===k).length,v=pct(n,f.length);const d=document.createElement("div");d.className="dist-row";d.innerHTML=`<div><b>${labelDecision(k)}</b><small>${n} karar</small></div><div><b>${v.toFixed(1)}%</b></div>`;$("distribution").appendChild(d)});
+  ds.forEach(k=>{const n=f.filter(r=>r.decision===k).length,v=pct(n,f.length);const d=document.createElement("div");d.className="dist-row";d.innerHTML=`<div><b>${labelDecision(k)}</b><small>${n} karar</small></div><div><b>${v.toFixed(1)}%</b></div><div class="dist-track"><i style="width:${v}%"></i></div>`;$("distribution").appendChild(d)});
   $("tbody").innerHTML="";
   f.forEach(r=>{const tr=document.createElement("tr"),dt=r.created_at?new Date(r.created_at).toLocaleString("tr-TR"):"";tr.innerHTML=`<td>${r.participant_code}</td><td>${r.grade}</td><td>${r.scenario_id}</td><td>${r.order_no}</td><td>${r.defender_count}</td><td>${labelDecision(r.decision)}</td><td>${tag(r.decision_kind)}</td><td>${((+r.rt_ms||0)/1000).toFixed(1)} sn</td><td>${r.study_phase}</td><td>${dt}</td>`;$("tbody").appendChild(tr)})
 }
 function csvEscape(v){const s=String(v??"");return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+function openResetModal(){
+  $("resetPhrase").value="";
+  $("resetStatus").textContent=rows.length ? rows.length+" kayıt kalıcı olarak silinecek." : "Silinecek kayıt bulunmuyor.";
+  $("confirmReset").disabled=true;
+  $("resetModal").classList.remove("hidden");
+  setTimeout(()=>$("resetPhrase").focus(),50);
+}
+function closeResetModal(){
+  $("resetModal").classList.add("hidden");
+  $("resetStatus").textContent="";
+}
+async function resetAllData(){
+  if($("resetPhrase").value.trim().toUpperCase()!=="SIFIRLA") return;
+  const btn=$("confirmReset");
+  btn.disabled=true;
+  btn.textContent="Siliniyor…";
+  $("resetStatus").textContent="Merkezi veritabanı sıfırlanıyor…";
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/reset_research_data",{
+      method:"POST",
+      headers:{
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer "+accessToken,
+        "Content-Type":"application/json"
+      },
+      body:"{}"
+    });
+    if(r.status===401){logout();throw new Error("Oturum süresi doldu. Yeniden giriş yapın.");}
+    if(!r.ok){
+      const detail=await r.text();
+      throw new Error("Sıfırlama işlemi başarısız. "+detail);
+    }
+    rows=[];
+    render();
+    $("search").value="";
+    $("gradeFilter").value="";
+    $("defFilter").value="";
+    $("phaseFilter").value="pilot";
+    render();
+    closeResetModal();
+    alert("Tüm merkezi araştırma verileri başarıyla sıfırlandı.");
+  }catch(e){
+    $("resetStatus").textContent=e.message;
+  }finally{
+    btn.textContent="Tüm Verileri Sil";
+    btn.disabled=$("resetPhrase").value.trim().toUpperCase()!=="SIFIRLA";
+  }
+}
 function downloadCSV(){
   const f=filtered();if(!f.length){alert("İndirilecek veri yok.");return}
   const cols=["id","session_id","participant_code","grade","scenario_id","order_no","defender_count","decision","decision_kind","rt_ms","study_phase","app_version","client_timestamp","created_at"];
@@ -121,7 +428,14 @@ function downloadCSV(){
 }
 $("login").onclick=async()=>{try{$("loginError").textContent="Giriş yapılıyor…";await signIn($("email").value.trim(),$("password").value);$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");$("loginError").textContent="";await fetchRows()}catch(e){$("loginError").textContent=e.message}};
 $("refresh").onclick=()=>fetchRows().catch(e=>alert(e.message));$("download").onclick=downloadCSV;$("logout").onclick=logout;
+$("resetData").onclick=e=>{e.preventDefault();openResetModal()};
+$("cancelReset").onclick=closeResetModal;
+$("resetModal").onclick=e=>{if(e.target===$("resetModal"))closeResetModal()};
+$("resetPhrase").addEventListener("input",()=>{$("confirmReset").disabled=$("resetPhrase").value.trim().toUpperCase()!=="SIFIRLA"});
+$("resetPhrase").addEventListener("keydown",e=>{if(e.key==="Enter"&&!$("confirmReset").disabled)resetAllData()});
+$("confirmReset").onclick=resetAllData;
 ["search","gradeFilter","defFilter","phaseFilter"].forEach(id=>$(id).addEventListener("input",render));
+initSidebarNavigation();
 if(accessToken){$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");fetchRows().catch(()=>logout())}
 </script>
 </body>
