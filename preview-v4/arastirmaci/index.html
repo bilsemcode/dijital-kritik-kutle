@@ -28,7 +28,7 @@
   --shadow:0 10px 26px rgba(31,65,55,.06);
 }
 *{box-sizing:border-box}
-html{background:var(--bg)}
+html{background:var(--bg);scroll-behavior:smooth}
 body{
   margin:0;min-height:100vh;color:var(--ink);background:var(--bg);
   font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
@@ -75,7 +75,7 @@ input:focus,select:focus{border-color:#87c9b8;box-shadow:0 0 0 4px rgba(15,169,1
 }
 .side-link svg{width:15px;height:15px;stroke-width:1.8;opacity:.9}
 .side-link.active{background:rgba(255,255,255,.09);color:#fff;border-color:rgba(255,255,255,.06)}
-.side-link:hover{background:rgba(255,255,255,.06)}
+.side-link:hover{background:rgba(255,255,255,.06)}\n#overview,#analyses,#records{scroll-margin-top:86px}
 .side-foot{margin-top:auto;padding:14px 9px 2px;border-top:1px solid rgba(255,255,255,.08);color:#78978d;font-size:8.5px;line-height:1.5}
 .workspace{min-width:0;padding:0 28px 42px}
 .top{
@@ -185,7 +185,7 @@ tbody tr:hover{background:#fbfdfc}
       </div>
       <div class="side-label">Araştırma</div>
       <nav class="side-nav">
-        <a class="side-link active" href="#" onclick="return false;">
+        <a class="side-link active" href="#overview" data-target="overview">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
           <span>Genel Görünüm</span>
         </a>
@@ -214,7 +214,7 @@ tbody tr:hover{background:#fbfdfc}
         <div class="toolbar"><button class="btn ghost" id="refresh">Yenile</button><button class="btn primary" id="download">CSV İndir</button><button class="btn ghost" id="logout">Çıkış</button></div>
       </div>
 
-      <section class="hero"><div><h2>Araştırma görünümü</h2><p>Katılımcı oturumları, davranış dağılımları ve savunucu düzeylerine göre sonuçların merkezi görünümü.</p></div></section>
+      <section class="hero" id="overview"><div><h2>Araştırma görünümü</h2><p>Katılımcı oturumları, davranış dağılımları ve savunucu düzeylerine göre sonuçların merkezi görünümü.</p></div></section>
 
       <section class="stats">
         <div class="card stat"><div class="label">Katılımcı</div><div class="val" id="participants">0</div><div class="trend">benzersiz oturum</div></div>
@@ -224,7 +224,7 @@ tbody tr:hover{background:#fbfdfc}
         <div class="card stat"><div class="label">Ort. karar süresi</div><div class="val" id="avgRt">0</div><div class="trend">saniye</div></div>
       </section>
 
-      <section class="grid">
+      <section class="grid" id="analyses">
         <div class="card panel"><h3>Savunucu akran sayısına göre aktif savunma oranı</h3><div class="sub">Kritik kütle eğrisinin ilk görsel kontrolü</div><div id="bars"></div></div>
         <div class="card panel"><h3>Davranış dağılımı</h3><div class="sub">Seçeneklere göre karar dağılımı</div><div id="distribution" class="dist"></div></div>
       </section>
@@ -251,6 +251,39 @@ const SUPABASE_KEY="sb_publishable_-fHeoH2uk6W4NZvSpirgOQ_hdrWzCn3";
 const $=id=>document.getElementById(id);
 let accessToken=sessionStorage.getItem("dkk_access_token")||"";
 let rows=[];
+
+
+function initSidebarNavigation(){
+  const links=[...document.querySelectorAll('.side-link[data-target]')];
+  const targets=links.map(link=>document.getElementById(link.dataset.target)).filter(Boolean);
+  const activate=(id)=>{
+    links.forEach(link=>link.classList.toggle('active',link.dataset.target===id));
+  };
+  links.forEach(link=>{
+    link.addEventListener('click',e=>{
+      e.preventDefault();
+      const id=link.dataset.target;
+      activate(id);
+      if(id==='overview'){
+        window.scrollTo({top:0,behavior:'smooth'});
+      }else{
+        document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    });
+  });
+  const updateActive=()=>{
+    if(window.scrollY<180){activate('overview');return}
+    let current='overview';
+    for(const target of targets){
+      if(target.id==='overview') continue;
+      const rect=target.getBoundingClientRect();
+      if(rect.top<=140) current=target.id;
+    }
+    activate(current);
+  };
+  window.addEventListener('scroll',updateActive,{passive:true});
+  updateActive();
+}
 
 async function signIn(email,password){
   const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{
@@ -300,7 +333,7 @@ function downloadCSV(){
 $("login").onclick=async()=>{try{$("loginError").textContent="Giriş yapılıyor…";await signIn($("email").value.trim(),$("password").value);$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");$("loginError").textContent="";await fetchRows()}catch(e){$("loginError").textContent=e.message}};
 $("refresh").onclick=()=>fetchRows().catch(e=>alert(e.message));$("download").onclick=downloadCSV;$("logout").onclick=logout;
 ["search","gradeFilter","defFilter","phaseFilter"].forEach(id=>$(id).addEventListener("input",render));
-if(accessToken){$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");fetchRows().catch(()=>logout())}
+initSidebarNavigation();\nif(accessToken){$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");fetchRows().catch(()=>logout())}
 </script>
 </body>
 </html>
