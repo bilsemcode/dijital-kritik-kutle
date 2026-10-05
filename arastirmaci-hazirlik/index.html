@@ -517,7 +517,7 @@ function renderTimeBars(f){
   const max=Math.max(1,...vals);
   $("timeBars").innerHTML=vals.map((v,n)=>{
     const h=Math.max(2,(v/max)*165);
-    return `<div class="col-item"><div class="col-value">${v.toFixed(1)} sn</div><div class="col-bar" style="height:${h}px"></div><div class="col-label">${n} sav.</div></div>`
+    return `<div class="col-item"><div class="col-value">${v.toFixed(2)} sn</div><div class="col-bar" style="height:${h}px"></div><div class="col-label">${n} sav.</div></div>`
   }).join("");
 }
 function render(){
@@ -540,7 +540,7 @@ function render(){
   }
   $("activePct").textContent=pct(f.filter(r=>r.decision_kind==="aktif").length,f.length).toFixed(1)+"%";
   $("publicPct").textContent=pct(f.filter(r=>r.decision==="public_defend").length,f.length).toFixed(1)+"%";
-  $("avgRt").textContent=(f.length?f.reduce((s,r)=>s+(+r.rt_ms||0),0)/f.length/1000:0).toFixed(1);
+  $("avgRt").textContent=(f.length?f.reduce((s,r)=>s+(+r.rt_ms||0),0)/f.length/1000:0).toFixed(2);
   renderCriticalChart(f);
   const pubRates=[0,1,2,3,4].map(n=>{const g=f.filter(r=>Number(r.defender_count)===n);return pct(g.filter(r=>r.decision==="public_defend").length,g.length)});
   const jumps=pubRates.slice(1).map((v,i)=>v-pubRates[i]);
