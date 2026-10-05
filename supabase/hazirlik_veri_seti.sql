@@ -41,7 +41,7 @@ with participants as (
   select
     i,
     (9 + floor(i / 60.0))::int as grade,
-    'P' || lpad((14 + i)::text, 3, '0') as participant_code,
+    'K' || lpad((14 + i)::text, 3, '0') as participant_code,
     'prep-session-' || lpad((i + 1)::text, 3, '0') as session_id,
     (
       timestamptz '2026-09-03 08:00:00+03'
