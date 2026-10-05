@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Araştırma Platformu Beta — Dijital Kritik Kütle</title>
+<style>
+:root{
+  --bg:#f6f8f7;--surface:#fff;--surface2:#f2f7f5;--ink:#17211e;--muted:#6d7974;
+  --line:#dde6e2;--sidebar:#102a24;--brand:#0ea887;--brand2:#0b7f69;--soft:#e8f7f2;
+  --blue:#4f7ee8;--blue-soft:#edf3ff;--amber:#df9b43;--amber-soft:#fff4e4;
+  --rose:#c97385;--rose-soft:#fbeef2;--shadow:0 12px 30px rgba(31,65,55,.07)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.gate{max-width:440px;margin:8vh auto;padding:34px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 50px rgba(26,69,56,.10)}
+.gate .kicker{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--brand2)}
+.gate h1{font-size:31px;letter-spacing:-.045em;margin:13px 0 8px}.gate p{font-size:12px;line-height:1.65;color:var(--muted)}
+label{display:block;margin:14px 0 6px;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5d6965}
+input,select,textarea{width:100%;border:1px solid #d4dfdb;border-radius:10px;background:#fff;color:var(--ink);padding:11px 12px;outline:none}
+textarea{resize:vertical;min-height:82px}
+input:focus,select:focus,textarea:focus{border-color:#86c9b7;box-shadow:0 0 0 4px rgba(14,168,135,.08)}
+.btn{border:1px solid transparent;border-radius:10px;padding:10px 13px;font-weight:760;background:#fff;color:#44524d}
+.btn.primary{background:var(--brand);color:#fff;box-shadow:0 8px 18px rgba(14,168,135,.17)}
+.btn.ghost{border-color:var(--line)}
+.btn.soft{background:var(--soft);color:var(--brand2);border-color:#d5ebe3}
+.btn.warn{background:#fff8f9;color:#a45d6b;border-color:#efd5db}
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;background:var(--sidebar);color:#fff;padding:22px 15px;display:flex;flex-direction:column}
+.side-brand{display:flex;gap:11px;align-items:center;padding:0 7px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.side-logo{width:38px;height:38px;border-radius:12px;background:var(--brand);display:grid;place-items:center;font-size:10px;font-weight:800}
+.side-brand b{display:block;font-size:13px}.side-brand span{display:block;margin-top:3px;color:#8fa9a1;font-size:9px}
+.side-label{margin:22px 9px 8px;color:#718e85;font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:5px}
+.nav button{width:100%;text-align:left;border:1px solid transparent;background:transparent;color:#c5d4cf;padding:10px 11px;border-radius:9px;font-size:10.5px;font-weight:680}
+.nav button.active,.nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+.side-foot{margin-top:auto;padding:14px 9px 3px;border-top:1px solid rgba(255,255,255,.08);color:#78978d;font-size:8.5px;line-height:1.55}
+.workspace{min-width:0;padding:0 28px 44px}
+.topbar{position:sticky;top:0;z-index:20;margin:0 -28px 22px;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;gap:16px;background:rgba(246,248,247,.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.topbar h1{margin:0;font-size:13px}.topbar p{margin:3px 0 0;color:var(--muted);font-size:9.5px}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.view{display:none}.view.active{display:block}
+.hero{display:flex;justify-content:space-between;align-items:end;gap:24px;margin:4px 0 18px}
+.hero h2{font-size:32px;letter-spacing:-.045em;margin:0 0 6px}.hero p{margin:0;color:var(--muted);font-size:11.5px;line-height:1.6;max-width:760px}
+.badge{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;border:1px solid #cfe8df;background:#f5fbf8;color:var(--brand2);font-size:8.5px;font-weight:800}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--brand)}
+.grid{display:grid;gap:14px}.grid.cols2{grid-template-columns:1.25fr .75fr}.grid.cols3{grid-template-columns:repeat(3,1fr)}
+.card{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}
+.pad{padding:19px}
+.card h3{font-size:12px;margin:0 0 6px}.sub{font-size:9.5px;color:var(--muted);line-height:1.55}
+.study-card{padding:18px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}
+.study-title{display:flex;align-items:center;gap:10px}.study-mark{width:40px;height:40px;border-radius:12px;background:var(--soft);display:grid;place-items:center;color:var(--brand2);font-weight:800}
+.study-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}.chip{padding:5px 7px;border:1px solid var(--line);border-radius:999px;background:#fafcfb;font-size:8.5px;color:#68746f}
+.chip.lock{background:#fff6e8;color:#9a691d;border-color:#f2dfbd}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin:14px 0}
+.metric{padding:16px;border:1px solid var(--line);border-radius:13px;background:#fff}.metric b{display:block;font-size:26px;letter-spacing:-.04em}.metric span{font-size:8.5px;color:var(--muted)}
+.progressbar{height:8px;border-radius:999px;background:#edf2f0;overflow:hidden}.progressbar i{display:block;height:100%;background:var(--brand)}
+.grade-row{display:grid;grid-template-columns:70px 1fr 50px;gap:10px;align-items:center;margin:12px 0;font-size:9.5px}
+.builder{display:grid;grid-template-columns:1fr 1fr;gap:12px}.builder .wide{grid-column:1/-1}
+.note{padding:11px 12px;border-radius:10px;background:#f7faf9;border:1px solid var(--line);font-size:9.5px;color:#68746f;line-height:1.55}
+.note.safe{background:#f4fbf8;border-color:#d7ebe4;color:#45655a}
+.study-list{display:flex;flex-direction:column;gap:9px;margin-top:12px}.draft-card{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:11px;background:#fff}
+.scenario-layout{display:grid;grid-template-columns:230px 1fr 330px;gap:14px;align-items:start}
+.scenario-list{max-height:690px;overflow:auto;padding:8px}.scenario-item{width:100%;text-align:left;padding:9px 10px;margin-bottom:5px;border:1px solid transparent;border-radius:9px;background:#f8faf9;font-size:9.5px;color:#52605b}.scenario-item.active{background:var(--soft);border-color:#cfe8df;color:var(--brand2);font-weight:760}
+.editor{padding:18px}.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.editor-grid .wide{grid-column:1/-1}
+.phone-wrap{position:sticky;top:84px;padding:15px}.phone-shell{max-width:300px;margin:auto;border:8px solid #18221f;border-radius:28px;background:#fff;overflow:hidden;box-shadow:0 18px 40px rgba(17,40,33,.18)}
+.phone-top{height:24px;background:#18221f;position:relative}.phone-top::after{content:"";position:absolute;width:70px;height:8px;border-radius:999px;background:#31403b;left:50%;top:7px;transform:translateX(-50%)}
+.phone-head{padding:11px 12px;background:#f6f9f8;border-bottom:1px solid var(--line);font-size:10px;font-weight:760}
+.phone-msgs{padding:12px;min-height:360px}.pmsg{max-width:92%;margin:0 0 8px;padding:8px 9px;border-radius:11px;background:#f2f5f4;font-size:10px;line-height:1.42}.pmsg b{display:block;margin-bottom:2px;font-size:7.5px;text-transform:uppercase;color:#7d8783}.pmsg.aggr{background:var(--rose-soft);color:#704750}.pmsg.def{background:var(--soft);color:#285e50}
+.quality-list{display:flex;flex-direction:column;gap:8px}.quality-item{display:grid;grid-template-columns:100px 1fr auto;gap:10px;align-items:center;padding:11px 12px;border:1px solid var(--line);border-radius:10px}.quality-item.warn{background:#fffaf3;border-color:#f0dfbf}.quality-item.bad{background:#fff7f8;border-color:#efd7dd}
+.quality-item b{font-size:10px}.quality-item span{font-size:9px;color:var(--muted)}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:560px}table{width:100%;border-collapse:collapse;font-size:9.5px}th,td{padding:9px 10px;border-bottom:1px solid #edf1ef;text-align:left;white-space:nowrap}th{position:sticky;top:0;background:#f7faf8;font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:#6e7975}
+.donut{width:150px;height:150px;border-radius:50%;position:relative;background:#e9eeec}.donut::after{content:"";position:absolute;inset:25px;background:#fff;border:1px solid var(--line);border-radius:50%}.donut-center{position:absolute;inset:0;display:grid;place-items:center;z-index:2;text-align:center}.donut-center b{font-size:25px}.donut-center span{display:block;font-size:8px;color:var(--muted)}
+.legend{display:flex;flex-direction:column;gap:8px}.legend-row{display:grid;grid-template-columns:10px 1fr auto;gap:7px;align-items:center;font-size:9px}.legend-row i{width:8px;height:8px;border-radius:3px}
+.chart{height:230px;position:relative;border-left:1px solid #d4ded9;border-bottom:1px solid #d4ded9;margin:24px 12px 26px 40px}.chart-line{position:absolute;left:0;right:0;border-top:1px dashed #edf1ef}.chart-line:nth-child(1){top:25%}.chart-line:nth-child(2){top:50%}.chart-line:nth-child(3){top:75%}.cols{position:absolute;inset:0;display:flex;align-items:end;justify-content:space-around;gap:18px;padding:0 20px}.col{flex:1;max-width:64px;display:flex;flex-direction:column;justify-content:end;align-items:center;height:100%;position:relative}.col b{font-size:8.5px;margin-bottom:5px}.bar{width:70%;background:linear-gradient(180deg,#6bc1aa,var(--brand));border-radius:7px 7px 2px 2px;min-height:2px}.col span{position:absolute;bottom:-20px;font-size:8px;color:var(--muted);white-space:nowrap}
+.linkbox{display:flex;gap:8px;align-items:center;margin-top:11px}.linkbox input{font-size:10px}.qr{width:150px;height:150px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:8px;object-fit:contain}
+.toast{position:fixed;right:20px;bottom:20px;z-index:100;background:#16352d;color:#fff;border-radius:11px;padding:11px 14px;font-size:10px;box-shadow:0 16px 35px rgba(0,0,0,.18)}
+@media(max-width:1100px){.app{grid-template-columns:74px 1fr}.side-brand>div:last-child,.side-label,.nav button span,.side-foot{display:none}.side-brand{justify-content:center;padding:0 0 18px}.nav button{text-align:center}.scenario-layout{grid-template-columns:200px 1fr}.phone-wrap{grid-column:1/-1;position:static}.phone-shell{max-width:320px}}
+@media(max-width:780px){.app{display:block}.sidebar{display:none}.workspace{padding:0 12px 30px}.topbar{margin:0 -12px 18px;padding:12px}.metrics,.grid.cols3,.grid.cols2,.builder,.scenario-layout{grid-template-columns:1fr}.builder .wide,.editor-grid .wide{grid-column:auto}.editor-grid{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column}.study-card{grid-template-columns:1fr}.actions{width:100%}}
+</style>
+</head>
+<body>
+<section id="gate" class="gate">
+  <span class="kicker">Deneysel ekran · Beta</span>
+  <h1>Araştırma Platformu</h1>
+  <p>Bu ekran mevcut çalışan araştırmayı değiştirmez. Aynı araştırmacı hesabıyla canlı DKK verilerini görür; yeni araştırma ve senaryo fikirlerini güvenli taslak olarak denemenizi sağlar.</p>
+  <label>E-posta</label><input id="email" type="email" autocomplete="username">
+  <label>Parola</label><input id="password" type="password" autocomplete="current-password">
+  <button id="login" class="btn primary" style="width:100%;margin-top:14px">Panele Gir</button>
+  <div id="loginError" style="min-height:18px;margin-top:8px;color:#a75f6b;font-size:10px"></div>
+</section>
+
+<main id="dashboard" class="hidden">
+<div class="app">
+  <aside class="sidebar">
+    <div class="side-brand"><div class="side-logo">RP</div><div><b>Araştırma Platformu</b><span>Beta · güvenli önizleme</span></div></div>
+    <div class="side-label">Çalışma alanı</div>
+    <div class="nav">
+      <button class="active" data-view="researches"><span>Araştırmalar</span></button>
+      <button data-view="scenarios"><span>Senaryolar</span></button>
+      <button data-view="participants"><span>Katılımcılar</span></button>
+      <button data-view="analytics"><span>Analizler</span></button>
+      <button data-view="quality"><span>Veri Kalitesi</span></button>
+    </div>
+    <div class="side-label">Canlı sistem</div>
+    <div class="nav">
+      <button id="openClassic"><span>Mevcut Paneli Aç</span></button>
+      <button id="openMobile"><span>Mobil Katılımcı</span></button>
+    </div>
+    <div class="side-foot">Bu beta ekran yeni özellikleri denemek içindir. Canlı DKK araştırması ana panelde kalır.</div>
+  </aside>
+
+  <section class="workspace">
+    <div class="topbar">
+      <div><h1>Araştırma Platformu Beta</h1><p>Modüler sosyal bilim deney altyapısı</p></div>
+      <div class="actions"><button id="refresh" class="btn ghost">Veriyi Yenile</button><button id="logout" class="btn ghost">Çıkış</button></div>
+    </div>
+
+    <section id="view-researches" class="view active">
+      <div class="hero"><div><h2>Araştırmalar</h2><p>Canlı DKK çalışmasını güvenle izleyin; yeni araştırma taslaklarını mevcut sistemi bozmadan oluşturun ve klonlayın.</p></div><span class="badge">Canlı DKK + yerel taslaklar</span></div>
+
+      <div class="study-card card">
+        <div>
+          <div class="study-title"><div class="study-mark">DKK</div><div><h3 style="margin:0">Dijital Kritik Kütle</h3><div class="sub">Görünür savunucu akran normu ve kamusal savunma davranışı</div></div></div>
+          <div class="study-meta"><span class="chip lock">🔒 v1.0 kilitli</span><span class="chip">30 senaryo</span><span class="chip">0–4 savunucu</span><span class="chip">Pilot / Ana çalışma</span></div>
+        </div>
+        <div class="actions"><button id="cloneDKK" class="btn soft">Araştırmayı Klonla</button><button class="btn ghost" data-go="analytics">Canlı Analizi Aç</button></div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric"><b id="mParticipants">0</b><span>Katılımcı oturumu</span></div>
+        <div class="metric"><b id="mResponses">0</b><span>Toplam karar</span></div>
+        <div class="metric"><b id="mComplete">0</b><span>Tamamlanmış oturum</span></div>
+        <div class="metric"><b id="mTarget">240</b><span>Ana örneklem hedefi</span></div>
+      </div>
+
+      <div class="grid cols2">
+        <div class="card pad">
+          <h3>Yeni araştırma oluştur</h3><div class="sub">Bu form yalnızca beta taslağı oluşturur; canlı DKK araştırmasına dokunmaz.</div>
+          <div class="builder" style="margin-top:13px">
+            <div><label>Araştırma adı</label><input id="draftName" placeholder="Örn. Çevrimiçi Grup Normları"></div>
+            <div><label>Kısa kod / slug</label><input id="draftSlug" placeholder="grup-normlari"></div>
+            <div><label>Birincil sonuç değişkeni</label><input id="draftOutcome" placeholder="Örn. Kamusal karşı çıkma"></div>
+            <div><label>Deneysel değişken</label><input id="draftVariable" placeholder="Örn. Görünür destekçi sayısı"></div>
+            <div><label>Koşullar</label><input id="draftConditions" placeholder="0, 1, 2, 3, 4"></div>
+            <div><label>Hedef örneklem</label><input id="draftTarget" type="number" min="1" value="240"></div>
+            <div><label>Aşama</label><select id="draftPhase"><option>Pilot</option><option>Ana çalışma</option></select></div>
+            <div><label>Katılımcı kod başlangıcı</label><input id="draftCode" value="P014"></div>
+            <div class="wide"><label>Okul / grup kodu alanı</label><input id="draftGroup" placeholder="Örn. OKUL-A (isteğe bağlı)"></div>
+          </div>
+          <div class="note safe" style="margin-top:12px">Taslak kaydedildiğinde tarayıcınızda saklanır. “Yayınla” özelliğini bilerek canlı sisteme bağlamadım; önce bu yeni mimariyi onaylamanızı istiyorum.</div>
+          <div class="actions" style="margin-top:12px"><button id="saveDraft" class="btn primary">Taslağı Kaydet</button><button id="clearDrafts" class="btn ghost">Taslakları Temizle</button></div>
+        </div>
+        <div class="card pad">
+          <h3>Taslak araştırmalar</h3><div class="sub">Klonladığınız veya yeni oluşturduğunuz araştırmalar burada görünür.</div>
+          <div id="draftList" class="study-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-scenarios" class="view">
+      <div class="hero"><div><h2>Senaryo editörü</h2><p>DKK'nın 30 senaryosunu inceleyin veya klonlanmış bir taslak için senaryoyu değiştirin. Sağdaki telefon önizlemesi anında güncellenir.</p></div><span class="badge">Canlı araştırma kilitli</span></div>
+      <div class="scenario-layout">
+        <div class="card scenario-list" id="scenarioList"></div>
+        <div class="card editor">
+          <div class="note">Canlı DKK v1.0 kilitli olduğu için burada yaptığınız değişiklikler yalnızca önizlemede kalır. Böylece veri toplama başladıktan sonra materyalin yanlışlıkla değişmesi engellenir.</div>
+          <div class="editor-grid" style="margin-top:12px">
+            <div><label>Senaryo ID</label><input id="edId" disabled></div>
+            <div><label>Grup / oda adı</label><input id="edRoom"></div>
+            <div><label>1. kişi</label><input id="edP1"></div>
+            <div><label>1. mesaj</label><input id="edM1"></div>
+            <div><label>2. kişi</label><input id="edP2"></div>
+            <div><label>2. mesaj</label><input id="edM2"></div>
+            <div><label>Hedefleyen kişi</label><input id="edAggWho"></div>
+            <div class="wide"><label>Hedefleyen / kırıcı mesaj</label><textarea id="edAggMsg"></textarea></div>
+            <div class="wide"><label>Deney koşulları</label><input id="edConditions" value="0, 1, 2, 3, 4 görünür savunucu"></div>
+          </div>
+          <div class="actions" style="margin-top:12px"><button id="previewSave" class="btn soft">Önizlemeyi Güncelle</button><button id="resetScenario" class="btn ghost">Orijinale Dön</button></div>
+        </div>
+        <div class="card phone-wrap">
+          <div class="phone-shell">
+            <div class="phone-top"></div>
+            <div class="phone-head" id="pvRoom">Sınıf Grubu</div>
+            <div class="phone-msgs" id="pvMsgs"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-participants" class="view">
+      <div class="hero"><div><h2>Katılımcılar</h2><p>Örneklem ilerlemesini, sınıf dağılımını ve paylaşılabilir katılımcı bağlantılarını tek ekrandan izleyin.</p></div><span class="badge">Hedef: 240 tamamlanmış öğrenci</span></div>
+      <div class="grid cols2">
+        <div class="card pad">
+          <h3>Örneklem ilerlemesi</h3>
+          <div style="display:flex;justify-content:space-between;align-items:end;margin:16px 0 8px"><b id="progressText" style="font-size:28px">0 / 240</b><span id="progressPct" class="sub">0%</span></div>
+          <div class="progressbar"><i id="sampleProgress" style="width:0%"></i></div>
+          <div id="gradeProgress" style="margin-top:18px"></div>
+        </div>
+        <div class="card pad">
+          <h3>Katılımcı bağlantıları</h3><div class="sub">Telefonla uygulama için mobil bağlantıyı veya masaüstü bağlantısını paylaşabilirsiniz.</div>
+          <label>Mobil katılım</label>
+          <div class="linkbox"><input id="mobileLink" readonly value="https://bilsemcode.github.io/dijital-kritik-kutle/mobil/"><button class="btn soft" data-copy="mobileLink">Kopyala</button></div>
+          <label>Masaüstü katılım</label>
+          <div class="linkbox"><input id="desktopLink" readonly value="https://bilsemcode.github.io/dijital-kritik-kutle/"><button class="btn soft" data-copy="desktopLink">Kopyala</button></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+            <div><div class="sub" style="margin-bottom:7px">Mobil QR</div><img class="qr" alt="Mobil katılım QR kodu" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fbilsemcode.github.io%2Fdijital-kritik-kutle%2Fmobil%2F"></div>
+            <div><div class="sub" style="margin-bottom:7px">Masaüstü QR</div><img class="qr" alt="Masaüstü katılım QR kodu" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fbilsemcode.github.io%2Fdijital-kritik-kutle%2F"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-analytics" class="view">
+      <div class="hero"><div><h2>Analizler</h2><p>Mevcut Supabase verisinden otomatik hesaplanan canlı araştırma görünümü.</p></div><span class="badge">Aynı merkezi veri</span></div>
+      <div class="grid cols2">
+        <div class="card pad"><h3>Kritik kütle görünümü</h3><div class="sub">Savunucu sayısına göre kamusal karşı çıkma oranı</div><div class="chart"><div class="chart-line"></div><div class="chart-line"></div><div class="chart-line"></div><div id="criticalCols" class="cols"></div></div></div>
+        <div class="card pad"><h3>Davranış dağılımı</h3><div class="sub">Tüm kararların seçeneklere göre dağılımı</div><div style="display:grid;grid-template-columns:170px 1fr;gap:18px;align-items:center;margin-top:20px"><div style="position:relative"><div id="donut" class="donut"></div><div class="donut-center"><div><b id="donutN">0</b><span>karar</span></div></div></div><div id="legend" class="legend"></div></div></div>
+      </div>
+      <div class="card pad" style="margin-top:14px"><h3>Canlı karar kayıtları</h3><div class="tablewrap" style="margin-top:12px"><table><thead><tr><th>Katılımcı</th><th>Sınıf</th><th>Senaryo</th><th>Savunucu</th><th>Karar</th><th>Süre</th><th>Aşama</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
+    </section>
+
+    <section id="view-quality" class="view">
+      <div class="hero"><div><h2>Veri Kalitesi</h2><p>Otomatik işaretlemeler yalnızca inceleme içindir; hiçbir katılımcı kaydı kendiliğinden silinmez.</p></div><span class="badge">Önceden tanımlı kontroller</span></div>
+      <div class="metrics">
+        <div class="metric"><b id="qIncomplete">0</b><span>Eksik oturum</span></div>
+        <div class="metric"><b id="qFast">0</b><span>Çok hızlı oturum</span></div>
+        <div class="metric"><b id="qDuplicate">0</b><span>Tekrarlı kod</span></div>
+        <div class="metric"><b id="qClean">0</b><span>Temiz tamamlanmış</span></div>
+      </div>
+      <div class="card pad"><h3>İncelenmesi önerilen kayıtlar</h3><div class="sub">Örnek eşik: 30 senaryodan az yanıt veya toplam karar süresi 4 dakikanın altında.</div><div id="qualityList" class="quality-list" style="margin-top:14px"></div></div>
+    </section>
+  </section>
+</div>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const SUPABASE_URL="https://urawvamivtcqhztfdazn.supabase.co";
+const SUPABASE_KEY="sb_publishable_-fHeoH2uk6W4NZvSpirgOQ_hdrWzCn3";
+const SCENARIOS=[
+{id:"S01",group:"mixed",room:"11-A Sınıf Grubu",pre:[["Ece","Yarın okul çıkışı kafeye giden var mı?"],["Mert","Ben varım, 4 gibi çıkabiliriz."]],aggr:["Deniz","Selin'i çağırmayın ya, gelince ortamın tadı kaçıyor."]},
+{id:"S02",group:"mixed",room:"10-B Etüt Grubu",pre:[["Bora","Dördüncü soruyu böyle çözdüm, atıyorum."],["Naz","Benim çözüm biraz farklı."]],aggr:["Eren","Bora bunu ciddi ciddi doğru diye mi attın?"]},
+{id:"S03",group:"mixed",room:"Gezi Grubu",pre:[["Melis","Cumartesi AVM'ye kaçta geçiyoruz?"],["Aras","2 gibi buluşabiliriz."]],aggr:["Sarp","Mina gelmesin ya, her planı bozuyor."]},
+{id:"S04",group:"mixed",room:"Sınıf Story Grubu",pre:[["Duru","Sınıf fotosunu storye attım."],["Mert","Güzel olmuş bence."]],aggr:["Kaan","Ece'yi niye koydunuz, fotoğrafın havası gitmiş."]},
+{id:"S05",group:"mixed",room:"Matematik Grubu",pre:[["Arda","Matematik çözümünü gruba atıyorum."],["Ece","Ben sonra bakarım."]],aggr:["Bora","Arda bunu ciddi ciddi doğru diye mi attın?"]},
+{id:"S06",group:"mixed",room:"Sunum Grubu",pre:[["Nisa","Sunumun ilk taslağını yükledim."],["Ege","Akşam hep birlikte bakalım."]],aggr:["Kaan","Nisa'nın yaptığını kullanmayalım, yine çok kötü olmuş."]},
+{id:"S07",group:"mixed",room:"Kermes Grubu",pre:[["İrem","Kermeste kasa tarafında ben durabilirim."],["Can","Görevleri akşam netleştirelim."]],aggr:["Doruk","İrem'e kasa vermeyin, yine her şeyi karıştırır."]},
+{id:"S08",group:"mixed",room:"Okul Kulübü",pre:[["Kerem","Kulüp afişinin yeni halini attım."],["Ada","Renkler daha iyi olmuş."]],aggr:["Eren","Kerem'in yaptığını paylaşmayın, baya amatör duruyor."]},
+{id:"S09",group:"mixed",room:"Sınıf Sohbeti",pre:[["Yağmur","Bugünkü soruyu anlayan var mı?"],["Efe","Ben de çözemedim."]],aggr:["Onur","Efe'nin çözememesi şaşırtmadı zaten."]},
+{id:"S10",group:"mixed",room:"Doğum Günü Planı",pre:[["Zeynep","Doğum günü için kimler geliyor?"],["Can","Ben gelirim."]],aggr:["Duru","Mert'i çağırmasak daha iyi, ortam geriliyor."]},
+{id:"S11",group:"mixed",room:"Yakın Arkadaşlar",pre:[["Mina","Akşam Discord'a giriyor muyuz?"],["Aras","Ben 9 gibi girerim."]],aggr:["Umut","Duru gelmesin ya, onsuz daha rahat oluyor."]},
+{id:"S12",group:"mixed",room:"Mezuniyet Fotoğrafları",pre:[["Lara","Mezuniyet fotoğraflarını gruba attım."],["Poyraz","Birkaç tane çok iyi çıkmış."]],aggr:["Doruk","Ayça'nın olduğu fotoğrafları paylaşmayın, hepsini bozmuş."]},
+{id:"S13",group:"mixed",room:"Sınıf Sunum Grubu",pre:[["Deniz","Sunumda hangi konuyu seçelim?"],["Ece","Herkes bir öneri yazsın."]],aggr:["Arda","Sude'nin fikrini geçelim, zaten hep alakasız şeyler söylüyor."]},
+{id:"S14",group:"mixed",room:"Proje Grubu",pre:[["Ozan","Sonuç grafiğini dosyaya ekledim."],["Ada","Dosyada gördüm, birazdan bakarım."]],aggr:["Eren","Ozan'ınkini baştan yapalım, ondan düzgün iş çıkmıyor."]},
+{id:"S15",group:"mixed",room:"Müzik Kulübü",pre:[["Zeynep","Prova kaydını yükledim."],["Mert","Akşam dinleyelim."]],aggr:["Alp","Zeynep'in kısmını yine kayıttan çıkaralım, bütün ritmi bozuyor."]},
+{id:"S16",group:"girls",room:"Kız Voleybol Takımı",pre:[["Eylül","Yarınki maçta servis sırası aynı mı?"],["Duru","Hocanın attığı liste öyle."]],aggr:["İpek","Sude'yi ilk altıya yazmasak daha iyi, her topu kaçırıyor."]},
+{id:"S17",group:"girls",room:"Kızlar Buluşma Grubu",pre:[["Selin","Cumartesi kahveye gidelim mi?"],["Ece","Ben gelirim."]],aggr:["Duru","Melis'i çağırmayın ya, gelince bütün plan değişiyor."]},
+{id:"S18",group:"girls",room:"Kız Basketbol Takımı",pre:[["Zeynep","Antrenmandan sonra şut çalışalım mı?"],["Nisa","Ben kalırım."]],aggr:["Aylin","İrem kalmasa da olur, zaten takımı yavaşlatıyor."]},
+{id:"S19",group:"girls",room:"Kızlar Yakın Arkadaşlar",pre:[["Melis","Dün çektiğimiz videoyu yakın arkadaşlara attım."],["Sena","Ben beğendim."]],aggr:["İpek","Duru'nun olduğu kısmı keseydiniz, videoyu bozmuş."]},
+{id:"S20",group:"girls",room:"Kızlar Etkinlik Grubu",pre:[["Elif","Mezuniyet panosunu ben düzenleyebilirim."],["Buse","Fotoğrafları ben toplarım."]],aggr:["Ceren","Elif yapmasın, geçen seferki gibi çocukça olur."]},
+{id:"S21",group:"girls",room:"Kızlar Film Planı",pre:[["Ayça","Cuma film için kimler geliyor?"],["Nehir","Ben varım."]],aggr:["Dila","Sena'yı çağırmayın, her şeyde sorun çıkarıyor."]},
+{id:"S22",group:"boys",room:"Erkek Halı Saha Grubu",pre:[["Emir","Cumartesi halı saha için 8 kişi olduk."],["Berk","Kaleye kim geçecek?"]],aggr:["Kaan","Ozan gelmesin, geçen maç onun yüzünden gitti."]},
+{id:"S23",group:"boys",room:"Erkek Basketbol Takımı",pre:[["Mert","Yarın okuldan sonra basket var mı?"],["Arda","Ben gelirim."]],aggr:["Efe","Can'ı takıma almayın, topu her aldığında kaybediyor."]},
+{id:"S24",group:"boys",room:"Erkekler Oyun Ekibi",pre:[["Bora","Akşam turnuva için lobbyyi ben açarım."],["Emir","9'da gireriz."]],aggr:["Kerem","Arda'yı takıma almayın, her maç bizi düşürüyor."]},
+{id:"S25",group:"boys",room:"Erkek Futbol Takımı",pre:[["Can","Maç için forma listesini attım."],["Ege","Ben orta sahadayım."]],aggr:["Umut","Berk'i ilk 11'e yazmayın, sahada hiçbir şey yapmıyor."]},
+{id:"S26",group:"boys",room:"Erkekler Buluşma Grubu",pre:[["Mert","Pazar sahile giden var mı?"],["Efe","Ben varım."]],aggr:["Kaan","Emir'i çağırmayın, gelince ortam sıkıcı oluyor."]},
+{id:"S27",group:"boys",room:"Erkekler Turnuva Grubu",pre:[["Arda","Turnuva eşleşmeleri geldi."],["Bora","İlk maç 8'de."]],aggr:["Eren","Can oynamasın, yine bütün takımı rezil eder."]},
+{id:"S28",group:"mixed",room:"11-B Sınıf Grubu",pre:[["Zeynep","Biyoloji notlarını PDF yaptım, gruba atıyorum."],["Can","Teşekkürler."]],aggr:["Bora","Eylül'e atmayın boşuna, zaten yine anlamaz."]},
+{id:"S29",group:"mixed",room:"Okul Gezisi Grubu",pre:[["Aras","Gezi otobüsünde yerleri nasıl ayarlıyoruz?"],["İpek","Herkes istediği yere oturacakmış."]],aggr:["Kerem","Mert bizim tarafa oturmasın, bütün yolu çekemem."]},
+{id:"S30",group:"mixed",room:"Şenlik Grubu",pre:[["Sena","Şenlik için müzik listesini konuşalım mı?"],["Toprak","Herkes bir şey yazsın."]],aggr:["Rüzgar","Beril'in önerilerini geçelim, zevki hiç uymuyor."]}
+];
+const DEF_TEXTS=["Bence böyle konuşmak doğru değil.","Ben de katılıyorum, bu yorum kırıcı olmuş.","Kişiyi hedef almadan konuşabiliriz.","Evet, böyle devam etmeyelim."];
+const $=id=>document.getElementById(id);
+let accessToken=sessionStorage.getItem("dkk_access_token")||"";
+let rows=[];
+let selectedScenario=0;
+let previewScenario=JSON.parse(JSON.stringify(SCENARIOS[0]));
+const DRAFT_KEY="dkk_platform_beta_drafts";
+
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.remove("hidden");setTimeout(()=>t.classList.add("hidden"),1800)}
+function pct(n,d){return d?100*n/d:0}
+function labelDecision(d){return({support_aggressor:"Saldırganı destekleme",silent:"Sessiz kalma",private_support:"Özelden destek",public_defend:"Grupta karşı çıkma",report:"Bildirim / yardım"}[d]||d)}
+function readDrafts(){try{return JSON.parse(localStorage.getItem(DRAFT_KEY)||"[]")}catch(e){return[]}}
+function writeDrafts(v){localStorage.setItem(DRAFT_KEY,JSON.stringify(v));renderDrafts()}
+function slugify(v){return v.toLocaleLowerCase("tr-TR").replace(/ı/g,"i").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+
+async function signIn(email,password){
+  const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});
+  const d=await r.json();if(!r.ok)throw new Error(d.error_description||d.msg||"Giriş başarısız.");
+  accessToken=d.access_token;sessionStorage.setItem("dkk_access_token",accessToken);
+}
+async function fetchRows(){
+  const r=await fetch(SUPABASE_URL+"/rest/v1/responses?select=*&order=created_at.desc&limit=10000",{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+accessToken}});
+  if(r.status===401){logout();throw new Error("Oturum süresi doldu.");}
+  if(!r.ok)throw new Error(await r.text());rows=await r.json();renderAll();
+}
+function logout(){accessToken="";sessionStorage.removeItem("dkk_access_token");$("dashboard").classList.add("hidden");$("gate").classList.remove("hidden")}
+
+function setView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+name));
+  document.querySelectorAll(".nav button[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===name));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll(".nav button[data-view]").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setView(b.dataset.go));
+
+function renderDrafts(){
+  const ds=readDrafts(),box=$("draftList");
+  if(!ds.length){box.innerHTML='<div class="note">Henüz taslak yok. Yeni araştırma oluşturabilir veya DKK’yı klonlayabilirsiniz.</div>';return}
+  box.innerHTML=ds.map((d,i)=>`<div class="draft-card"><div><b style="font-size:10.5px">${d.name}</b><div class="sub">${d.variable||"Değişken tanımlanmadı"} · ${d.conditions||"Koşul tanımlanmadı"} · hedef ${d.target||"-"}</div></div><button class="btn ghost" onclick="loadDraft(${i})">Düzenle</button></div>`).join("");
+}
+window.loadDraft=i=>{
+  const d=readDrafts()[i];if(!d)return;
+  $("draftName").value=d.name||"";$("draftSlug").value=d.slug||"";$("draftOutcome").value=d.outcome||"";$("draftVariable").value=d.variable||"";$("draftConditions").value=d.conditions||"";$("draftTarget").value=d.target||240;$("draftPhase").value=d.phase||"Pilot";$("draftCode").value=d.code||"P014";$("draftGroup").value=d.group||"";toast("Taslak forma yüklendi");
+}
+$("saveDraft").onclick=()=>{
+  const name=$("draftName").value.trim();if(!name){alert("Araştırma adı girin.");return}
+  const ds=readDrafts();ds.push({name,slug:$("draftSlug").value.trim()||slugify(name),outcome:$("draftOutcome").value.trim(),variable:$("draftVariable").value.trim(),conditions:$("draftConditions").value.trim(),target:Number($("draftTarget").value)||240,phase:$("draftPhase").value,code:$("draftCode").value.trim()||"P014",group:$("draftGroup").value.trim(),created:new Date().toISOString(),scenarios:[]});writeDrafts(ds);toast("Taslak kaydedildi");
+}
+$("clearDrafts").onclick=()=>{if(confirm("Beta taslakları temizlensin mi?"))writeDrafts([])}
+$("cloneDKK").onclick=()=>{
+  const ds=readDrafts();ds.push({name:"Dijital Kritik Kütle — Kopya",slug:"dkk-kopya-"+Date.now(),outcome:"Kamusal savunma",variable:"Görünür savunucu sayısı",conditions:"0, 1, 2, 3, 4",target:240,phase:"Pilot",code:"P014",group:"",created:new Date().toISOString(),scenarios:JSON.parse(JSON.stringify(SCENARIOS))});writeDrafts(ds);toast("DKK güvenli taslak olarak klonlandı");
+}
+
+function renderScenarioList(){
+  $("scenarioList").innerHTML=SCENARIOS.map((s,i)=>`<button class="scenario-item ${i===selectedScenario?"active":""}" data-i="${i}"><b>${s.id}</b> · ${s.room}</button>`).join("");
+  document.querySelectorAll(".scenario-item").forEach(b=>b.onclick=()=>{selectedScenario=Number(b.dataset.i);previewScenario=JSON.parse(JSON.stringify(SCENARIOS[selectedScenario]));loadScenarioEditor();renderScenarioList()});
+}
+function loadScenarioEditor(){
+  const s=previewScenario;$("edId").value=s.id;$("edRoom").value=s.room;$("edP1").value=s.pre[0][0];$("edM1").value=s.pre[0][1];$("edP2").value=s.pre[1][0];$("edM2").value=s.pre[1][1];$("edAggWho").value=s.aggr[0];$("edAggMsg").value=s.aggr[1];renderPhone();
+}
+function updatePreviewFromFields(){
+  previewScenario={...previewScenario,room:$("edRoom").value,pre:[[$("edP1").value,$("edM1").value],[$("edP2").value,$("edM2").value]],aggr:[$("edAggWho").value,$("edAggMsg").value]};renderPhone()
+}
+function renderPhone(){
+  const s=previewScenario;$("pvRoom").textContent=s.room;
+  const msgs=[...s.pre.map(x=>({who:x[0],text:x[1],cls:""})),{who:s.aggr[0],text:s.aggr[1],cls:"aggr"},{who:"Aylin",text:DEF_TEXTS[0],cls:"def"},{who:"Mert",text:DEF_TEXTS[1],cls:"def"}];
+  $("pvMsgs").innerHTML=msgs.map(m=>`<div class="pmsg ${m.cls}"><b>${m.who}</b>${m.text}</div>`).join("");
+}
+["edRoom","edP1","edM1","edP2","edM2","edAggWho","edAggMsg"].forEach(id=>$(id).addEventListener("input",updatePreviewFromFields));
+$("previewSave").onclick=()=>toast("Önizleme güncellendi — canlı çalışma değişmedi");
+$("resetScenario").onclick=()=>{previewScenario=JSON.parse(JSON.stringify(SCENARIOS[selectedScenario]));loadScenarioEditor();toast("Orijinale döndü")};
+
+function groupSessions(){
+  const m=new Map();rows.forEach(r=>{if(!m.has(r.session_id))m.set(r.session_id,[]);m.get(r.session_id).push(r)});return [...m.values()]
+}
+function renderOverview(){
+  const sessions=groupSessions(),complete=sessions.filter(s=>s.length>=30);
+  $("mParticipants").textContent=sessions.length;$("mResponses").textContent=rows.length;$("mComplete").textContent=complete.length;
+  const p=Math.min(100,pct(complete.length,240));$("progressText").textContent=complete.length+" / 240";$("progressPct").textContent=p.toFixed(0)+"%";$("sampleProgress").style.width=p+"%";
+  $("gradeProgress").innerHTML=[9,10,11,12].map(g=>{const n=complete.filter(s=>Number(s[0]?.grade)===g).length,v=Math.min(100,pct(n,60));return `<div class="grade-row"><span>${g}. sınıf</span><div class="progressbar"><i style="width:${v}%"></i></div><b>${n} / 60</b></div>`}).join("");
+}
+function renderAnalytics(){
+  const vals=[0,1,2,3,4].map(n=>{const g=rows.filter(r=>Number(r.defender_count)===n);return pct(g.filter(r=>r.decision==="public_defend").length,g.length)});
+  $("criticalCols").innerHTML=vals.map((v,n)=>`<div class="col"><b>${v.toFixed(0)}%</b><div class="bar" style="height:${Math.max(2,v*1.85)}px"></div><span>${n} sav.</span></div>`).join("");
+  const ds=["support_aggressor","silent","private_support","public_defend","report"],colors=["#d9919f","#aab4b0","#f0b866","#0fa987","#4c7ee8"],ns=ds.map(k=>rows.filter(r=>r.decision===k).length),total=ns.reduce((a,b)=>a+b,0);
+  let cur=0,parts=[];ns.forEach((n,i)=>{const p=total?100*n/total:0;parts.push(`${colors[i]} ${cur}% ${cur+p}%`);cur+=p});$("donut").style.background=total?`conic-gradient(${parts.join(",")})`:"#e9eeec";$("donutN").textContent=total;
+  $("legend").innerHTML=ds.map((k,i)=>`<div class="legend-row"><i style="background:${colors[i]}"></i><span>${labelDecision(k)}</span><b>${(total?100*ns[i]/total:0).toFixed(1)}%</b></div>`).join("");
+  $("tbody").innerHTML=rows.slice(0,500).map(r=>`<tr><td>${r.participant_code}</td><td>${r.grade}</td><td>${r.scenario_id}</td><td>${r.defender_count}</td><td>${labelDecision(r.decision)}</td><td>${((+r.rt_ms||0)/1000).toFixed(1)} sn</td><td>${r.study_phase}</td></tr>`).join("");
+}
+function renderQuality(){
+  const sessions=groupSessions();let inc=0,fast=0,clean=0;const flags=[];const codeCounts={};
+  sessions.forEach(s=>{const code=s[0]?.participant_code||"—";codeCounts[code]=(codeCounts[code]||0)+1;const incomplete=s.length<30,totalRt=s.reduce((a,r)=>a+(+r.rt_ms||0),0),tooFast=s.length>=30&&totalRt<240000;if(incomplete)inc++;if(tooFast)fast++;if(!incomplete&&!tooFast)clean++;if(incomplete||tooFast)flags.push({code,n:s.length,totalRt,incomplete,tooFast})});
+  const dup=Object.values(codeCounts).filter(n=>n>1).length;$("qIncomplete").textContent=inc;$("qFast").textContent=fast;$("qDuplicate").textContent=dup;$("qClean").textContent=clean;
+  $("qualityList").innerHTML=flags.length?flags.map(f=>`<div class="quality-item ${f.incomplete?"bad":"warn"}"><b>${f.code}</b><span>${f.incomplete?f.n+"/30 yanıt":"Tamamlandı"} · toplam karar süresi ${(f.totalRt/1000).toFixed(0)} sn</span><span class="chip">${f.incomplete?"Eksik":"Hızlı"}</span></div>`).join(""):'<div class="note safe">Şu anda otomatik kalite kontrolüne takılan oturum yok.</div>';
+}
+function renderAll(){renderOverview();renderAnalytics();renderQuality()}
+
+$("login").onclick=async()=>{try{$("loginError").textContent="Giriş yapılıyor…";await signIn($("email").value.trim(),$("password").value);$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");$("loginError").textContent="";await fetchRows()}catch(e){$("loginError").textContent=e.message}};
+$("refresh").onclick=()=>fetchRows().then(()=>toast("Canlı veri yenilendi")).catch(e=>alert(e.message));
+$("logout").onclick=logout;
+$("openClassic").onclick=()=>window.open("../arastirmaci/","_blank");
+$("openMobile").onclick=()=>window.open("../mobil/","_blank");
+document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText($(b.dataset.copy).value);toast("Bağlantı kopyalandı")}catch(e){$(b.dataset.copy).select();document.execCommand("copy");toast("Bağlantı kopyalandı")}});
+
+renderDrafts();renderScenarioList();loadScenarioEditor();
+if(accessToken){$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");fetchRows().catch(()=>logout())}
+</script>
+</body>
+</html>
