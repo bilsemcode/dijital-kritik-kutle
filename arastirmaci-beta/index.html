@@ -148,7 +148,7 @@ input:focus,select:focus,textarea:focus{border-color:#86c9b7;box-shadow:0 0 0 4p
             <div><label>Koşullar</label><input id="draftConditions" placeholder="0, 1, 2, 3, 4"></div>
             <div><label>Hedef örneklem</label><input id="draftTarget" type="number" min="1" value="240"></div>
             <div><label>Aşama</label><select id="draftPhase"><option>Pilot</option><option>Ana çalışma</option></select></div>
-            <div><label>Katılımcı kod başlangıcı</label><input id="draftCode" value="P014"></div>
+            <div><label>Katılımcı kod başlangıcı</label><input id="draftCode" value="K014"></div>
             <div class="wide"><label>Okul / grup kodu alanı</label><input id="draftGroup" placeholder="Örn. OKUL-A (isteğe bağlı)"></div>
           </div>
           <div class="note safe" style="margin-top:12px">Taslak kaydedildiğinde tarayıcınızda saklanır. “Yayınla” özelliğini bilerek canlı sisteme bağlamadım; önce bu yeni mimariyi onaylamanızı istiyorum.</div>
@@ -284,7 +284,7 @@ const DRAFT_KEY="dkk_platform_beta_drafts";
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.remove("hidden");setTimeout(()=>t.classList.add("hidden"),1800)}
 function pct(n,d){return d?100*n/d:0}
 function labelDecision(d){return({support_aggressor:"Saldırganı destekleme",silent:"Sessiz kalma",private_support:"Özelden destek",public_defend:"Grupta karşı çıkma",report:"Bildirim / yardım"}[d]||d)}
-function readDrafts(){try{return JSON.parse(localStorage.getItem(DRAFT_KEY)||"[]")}catch(e){return[]}}
+function readDrafts(){try{return JSON.parse(localStorage.getItem(DRAFT_KEY)||"[]").map(d=>({...d,code:(typeof d.code==="string"&&/^P\\d+$/.test(d.code))?"K"+d.code.slice(1):d.code}))}catch(e){return[]}}
 function writeDrafts(v){localStorage.setItem(DRAFT_KEY,JSON.stringify(v));renderDrafts()}
 function slugify(v){return v.toLocaleLowerCase("tr-TR").replace(/ı/g,"i").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
 
@@ -315,15 +315,15 @@ function renderDrafts(){
 }
 window.loadDraft=i=>{
   const d=readDrafts()[i];if(!d)return;
-  $("draftName").value=d.name||"";$("draftSlug").value=d.slug||"";$("draftOutcome").value=d.outcome||"";$("draftVariable").value=d.variable||"";$("draftConditions").value=d.conditions||"";$("draftTarget").value=d.target||240;$("draftPhase").value=d.phase||"Pilot";$("draftCode").value=d.code||"P014";$("draftGroup").value=d.group||"";toast("Taslak forma yüklendi");
+  $("draftName").value=d.name||"";$("draftSlug").value=d.slug||"";$("draftOutcome").value=d.outcome||"";$("draftVariable").value=d.variable||"";$("draftConditions").value=d.conditions||"";$("draftTarget").value=d.target||240;$("draftPhase").value=d.phase||"Pilot";$("draftCode").value=d.code||"K014";$("draftGroup").value=d.group||"";toast("Taslak forma yüklendi");
 }
 $("saveDraft").onclick=()=>{
   const name=$("draftName").value.trim();if(!name){alert("Araştırma adı girin.");return}
-  const ds=readDrafts();ds.push({name,slug:$("draftSlug").value.trim()||slugify(name),outcome:$("draftOutcome").value.trim(),variable:$("draftVariable").value.trim(),conditions:$("draftConditions").value.trim(),target:Number($("draftTarget").value)||240,phase:$("draftPhase").value,code:$("draftCode").value.trim()||"P014",group:$("draftGroup").value.trim(),created:new Date().toISOString(),scenarios:[]});writeDrafts(ds);toast("Taslak kaydedildi");
+  const ds=readDrafts();ds.push({name,slug:$("draftSlug").value.trim()||slugify(name),outcome:$("draftOutcome").value.trim(),variable:$("draftVariable").value.trim(),conditions:$("draftConditions").value.trim(),target:Number($("draftTarget").value)||240,phase:$("draftPhase").value,code:$("draftCode").value.trim()||"K014",group:$("draftGroup").value.trim(),created:new Date().toISOString(),scenarios:[]});writeDrafts(ds);toast("Taslak kaydedildi");
 }
 $("clearDrafts").onclick=()=>{if(confirm("Beta taslakları temizlensin mi?"))writeDrafts([])}
 $("cloneDKK").onclick=()=>{
-  const ds=readDrafts();ds.push({name:"Dijital Kritik Kütle — Kopya",slug:"dkk-kopya-"+Date.now(),outcome:"Kamusal savunma",variable:"Görünür savunucu sayısı",conditions:"0, 1, 2, 3, 4",target:240,phase:"Pilot",code:"P014",group:"",created:new Date().toISOString(),scenarios:JSON.parse(JSON.stringify(SCENARIOS))});writeDrafts(ds);toast("DKK güvenli taslak olarak klonlandı");
+  const ds=readDrafts();ds.push({name:"Dijital Kritik Kütle — Kopya",slug:"dkk-kopya-"+Date.now(),outcome:"Kamusal savunma",variable:"Görünür savunucu sayısı",conditions:"0, 1, 2, 3, 4",target:240,phase:"Pilot",code:"K014",group:"",created:new Date().toISOString(),scenarios:JSON.parse(JSON.stringify(SCENARIOS))});writeDrafts(ds);toast("DKK güvenli taslak olarak klonlandı");
 }
 
 function renderScenarioList(){
