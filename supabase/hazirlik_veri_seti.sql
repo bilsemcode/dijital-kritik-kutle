@@ -160,6 +160,31 @@ select
 from final_rows
 order by i,order_no;
 
+-- Karar sürelerini dengeli ve yeniden üretilebilir hale getir.
+-- Genel ortalama tam olarak 11,27 sn olur.
+with ranked_rt as (
+  select
+    id,
+    defender_count,
+    row_number() over (
+      partition by defender_count
+      order by participant_code, scenario_id, order_no
+    ) as rn
+  from public.prepared_responses
+)
+update public.prepared_responses p
+set rt_ms =
+  case r.defender_count
+    when 0 then 12200
+    when 1 then 11900
+    when 2 then 12500
+    when 3 then 10500
+    when 4 then 9250
+  end
+  + (((r.rn - 1) % 45) - 22) * 100
+from ranked_rt r
+where p.id = r.id;
+
 -- Kontrol sorguları
 select count(distinct session_id) as katilimci, count(*) as karar
 from public.prepared_responses;
