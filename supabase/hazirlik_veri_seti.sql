@@ -161,29 +161,33 @@ from final_rows
 order by i,order_no;
 
 -- Karar sürelerini dengeli ve yeniden üretilebilir hale getir.
--- Genel ortalama tam olarak 11,27 sn olur.
-with ranked_rt as (
+-- Koşullar içinde bireysel değişkenlik korunur; genel ortalama 11,27 sn olur.
+with noise as (
   select
     id,
     defender_count,
-    row_number() over (
-      partition by defender_count
-      order by participant_code, scenario_id, order_no
-    ) as rn
+    ((mod(abs(hashtextextended(id || '-rt-v2', 44117)), 4401)) - 2200)::numeric as raw_noise
   from public.prepared_responses
+),
+centered as (
+  select
+    id,
+    defender_count,
+    raw_noise - avg(raw_noise) over(partition by defender_count) as centered_noise
+  from noise
 )
 update public.prepared_responses p
-set rt_ms =
-  case r.defender_count
+set rt_ms = round(
+  case c.defender_count
     when 0 then 12200
     when 1 then 11900
     when 2 then 12500
     when 3 then 10500
     when 4 then 9250
-  end
-  + (((r.rn - 1) % 45) - 22) * 100
-from ranked_rt r
-where p.id = r.id;
+  end + c.centered_noise
+)::int
+from centered c
+where p.id = c.id;
 
 -- Kontrol sorguları
 select count(distinct session_id) as katilimci, count(*) as karar
