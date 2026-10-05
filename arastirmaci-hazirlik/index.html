@@ -301,8 +301,8 @@ tbody tr:hover{background:#fbfdfc}
 
       <section class="hero" id="overview"><div><h2>Tamamlanmış araştırma görünümü</h2><p>240 katılımcı ve 7.200 karar üzerinden tamamlanmış çalışma görünümü.</p></div></section>
   <div class="completion-strip">
-    <div><b>Ana çalışma tamamlandı</b><p>9, 10, 11 ve 12. sınıfların her birinde 60 katılımcı · toplam 240 katılımcı · 30 senaryo</p></div>
-    <div class="completion-progress"><div style="display:flex;justify-content:space-between;font-size:8.5px;color:#66756f;margin-bottom:5px"><span>Örneklem hedefi</span><b>240 / 240</b></div><div class="bar"><i></i></div></div>
+    <div><b id="completionTitle">Veri seti yükleniyor…</b><p id="completionDetail">Katılımcı ve karar kayıtları veritabanından okunuyor.</p></div>
+    <div class="completion-progress"><div style="display:flex;justify-content:space-between;font-size:8.5px;color:#66756f;margin-bottom:5px"><span>Örneklem hedefi</span><b id="completionCount">0 / 240</b></div><div class="bar"><i id="completionBar" style="width:0%"></i></div></div>
   </div>
 
       <section class="stats">
@@ -513,6 +513,21 @@ function renderTimeBars(f){
 function render(){
   const f=filtered(),sessions=new Set(f.map(r=>r.session_id)).size;
   $("participants").textContent=sessions;$("decisions").textContent=f.length;
+  const completedBySession=new Map();
+  f.forEach(r=>completedBySession.set(r.session_id,(completedBySession.get(r.session_id)||0)+1));
+  const completed=[...completedBySession.values()].filter(n=>n>=30).length;
+  $("completionCount").textContent=completed+" / 240";
+  $("completionBar").style.width=Math.min(100,100*completed/240)+"%";
+  if(completed>=240){
+    $("completionTitle").textContent="Ana çalışma tamamlandı";
+    $("completionDetail").textContent="9, 10, 11 ve 12. sınıfların her birinde 60 katılımcı · toplam 240 katılımcı · 30 senaryo";
+  }else if(f.length===0){
+    $("completionTitle").textContent="Veritabanında kayıt bulunamadı";
+    $("completionDetail").textContent="Hazırlık veri seti henüz Supabase'e yüklenmemiş veya tablo boş.";
+  }else{
+    $("completionTitle").textContent="Veri yükleniyor / eksik";
+    $("completionDetail").textContent=completed+" tamamlanmış oturum bulundu.";
+  }
   $("activePct").textContent=pct(f.filter(r=>r.decision_kind==="aktif").length,f.length).toFixed(1)+"%";
   $("publicPct").textContent=pct(f.filter(r=>r.decision==="public_defend").length,f.length).toFixed(1)+"%";
   $("avgRt").textContent=(f.length?f.reduce((s,r)=>s+(+r.rt_ms||0),0)/f.length/1000:0).toFixed(1);
