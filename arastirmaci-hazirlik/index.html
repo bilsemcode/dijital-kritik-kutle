@@ -620,9 +620,9 @@ async function resetAllData(){
     closeResetModal();
 
     if(rpcDetail){
-      alert("Tüm araştırma yanıtları silindi. Katılımcı sıra sayacının P014'e dönmesi için reset_research_data RPC fonksiyonunun Supabase'de kurulu olması gerekir.");
+      alert("Tüm araştırma yanıtları silindi. Katılımcı sıra sayacının K014'e dönmesi için reset_research_data RPC fonksiyonunun Supabase'de kurulu olması gerekir.");
     }else{
-      alert("Tüm araştırma verileri silindi ve katılımcı kod sayacı P014'e döndürüldü.");
+      alert("Tüm araştırma verileri silindi ve katılımcı kod sayacı K014'e döndürüldü.");
     }
   }catch(e){
     $("resetStatus").textContent=e.message;
