@@ -51,7 +51,7 @@ Ahlaki değer yargısı taşıyan etiketlerden kaçınılır. Katılımcı yaln�
 - Grupta bu yoruma katılmadığımı belirtirim.
 - Durumu grup yöneticisine veya bir yetişkine iletirim.
 
-Seçeneklerin ekran sırası katılımcı koduna bağlı beşli rotasyonla dengelenir; anlam kodu sabit kalır.
+Seçeneklerin ekran sırası, deneysel koşul ofsetinden **bağımsız** ikinci bir beşli rotasyonla dengelenir; anlam kodu sabit kalır. Böylece belirli bir deney koşulunun belirli bir cevap seçeneği konumuyla sistematik olarak eşleşmesi engellenir.
 
 ## 6. Koşul karşı-dengelemesi
 Her katılımcı beş koşulun her birinde **6 senaryo**, toplam 30 senaryo değerlendirir.
@@ -59,7 +59,7 @@ Her katılımcı beş koşulun her birinde **6 senaryo**, toplam 30 senaryo değ
 Bir senaryonun koşulu:
 `(senaryo_indeksi + katılımcı_ofseti) mod 5`
 
-Katılımcı ofseti K014'ten itibaren beşli döngüyle ilerler. Böylece art arda gelen her beş katılımcıda her senaryo beş koşulun tamamında bir kez görünür.
+Katılımcı ofseti K014'ten itibaren beşli döngüyle ilerler. Böylece art arda gelen her beş katılımcıda her senaryo beş koşulun tamamında bir kez görünür. Cevap seçeneklerinin konum rotasyonu ise katılımcı sırasının ikinci, bağımsız beşli döngüsünden türetilir; 25 katılımcılık tam döngüde deneysel koşul grubu × seçenek sırası kombinasyonlarının tamamı oluşur.
 
 ## 7. Senaryo sırası
 Senaryolar koşul kovaları içinde deterministik olarak karıştırılır. Altı tur boyunca her turda beş koşuldan birer senaryo gösterilir. Tur sınırlarında da aynı koşulun art arda gelmesi engellenir. Böylece uzun koşul serileri oluşmaz.
