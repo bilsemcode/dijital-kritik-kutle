@@ -323,7 +323,7 @@ function renderScenario(){
   document.querySelectorAll("#choices .choice").forEach(x=>x.disabled=true);
   const rt=Math.max(0,Math.round(performance.now()-state.scenarioStartedAt));state.rts.push(rt);
   const row={session_id:state.sessionId,participant_code:state.code,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass,
-    scenario_id:s.id,order_no:state.pos+1,defender_count:cond,peer_total:4,decision:c.value,decision_kind:c.kind,rt_ms:rt,
+    scenario_id:s.id,order_no:state.pos+1,defender_count:cond,peer_total:4,allocation_group:state.offset,decision:c.value,decision_kind:c.kind,rt_ms:rt,
     study_phase:"pilot",app_version:APP_VERSION,condition_version:CONDITION_VERSION,client_timestamp:new Date().toISOString()};
   $("note").textContent="Kaydediliyor…";await queueResponse(row);state.pos++;
   if(state.pos===10||state.pos===20){$("breakCount").textContent=state.pos+"/30";show("break");return}
@@ -336,7 +336,7 @@ document.querySelectorAll('input[name="aware"]').forEach(x=>x.addEventListener("
 $("finishBtn").onclick=async()=>{
  const aware=document.querySelector('input[name="aware"]:checked')?.value||"unsure";
  const meta={session_id:state.sessionId,participant_code:state.code,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass,
-   total_duration_ms:Math.max(0,Math.round(performance.now()-state.mainStartedAt)),awareness_guess:aware,app_version:APP_VERSION};
+   total_duration_ms:Math.max(0,Math.round(performance.now()-state.mainStartedAt)),allocation_group:state.offset,awareness_guess:aware,app_version:APP_VERSION};
  if(!(await sendMeta(meta))){const q=getQueue(META_QUEUE_KEY);q.push(meta);setQueue(META_QUEUE_KEY,q)}
  await flushPending();await flushMeta();
  $("doneCode").textContent=state.code;$("doneRt").textContent=(state.rts.reduce((a,b)=>a+b,0)/state.rts.length/1000).toFixed(1)+" sn";show("done");
