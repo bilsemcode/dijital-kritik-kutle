@@ -213,7 +213,7 @@ const namePools={
  boys:["Mert","Arda","Efe","Can","Berk","Emir","Bora","Kerem","Ege","Umut","Ozan","Alp"]
 };
 
-let state={grade:null,code:null,sessionId:null,codeNum:0,offset:0,siteCode:"OKUL-A",deviceClass:"desktop",order:[],pos:0,practicePos:0,scenarioStartedAt:0,mainStartedAt:0,rts:[],optionOrder:[]};
+let state={grade:null,code:null,sessionId:null,codeNum:0,offset:0,optionGroup:0,siteCode:"OKUL-A",deviceClass:"desktop",order:[],pos:0,practicePos:0,scenarioStartedAt:0,mainStartedAt:0,rts:[],optionOrder:[]};
 
 function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");window.scrollTo({top:0,behavior:"auto"})}
 function sanitizeSite(v){v=(v||"OKUL-A").toUpperCase().replace(/[^A-Z0-9_-]/g,"").slice(0,24);return v||"OKUL-A"}
@@ -323,7 +323,7 @@ function renderScenario(){
   document.querySelectorAll("#choices .choice").forEach(x=>x.disabled=true);
   const rt=Math.max(0,Math.round(performance.now()-state.scenarioStartedAt));state.rts.push(rt);
   const row={session_id:state.sessionId,participant_code:state.code,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass,
-    scenario_id:s.id,order_no:state.pos+1,defender_count:cond,peer_total:4,allocation_group:state.offset,decision:c.value,decision_kind:c.kind,rt_ms:rt,
+    scenario_id:s.id,order_no:state.pos+1,defender_count:cond,peer_total:4,allocation_group:state.offset,option_order_group:state.optionGroup,decision:c.value,decision_kind:c.kind,rt_ms:rt,
     study_phase:"pilot",app_version:APP_VERSION,condition_version:CONDITION_VERSION,client_timestamp:new Date().toISOString()};
   $("note").textContent="Kaydediliyor…";await queueResponse(row);state.pos++;
   if(state.pos===10||state.pos===20){$("breakCount").textContent=state.pos+"/30";show("break");return}
@@ -336,7 +336,7 @@ document.querySelectorAll('input[name="aware"]').forEach(x=>x.addEventListener("
 $("finishBtn").onclick=async()=>{
  const aware=document.querySelector('input[name="aware"]:checked')?.value||"unsure";
  const meta={session_id:state.sessionId,participant_code:state.code,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass,
-   total_duration_ms:Math.max(0,Math.round(performance.now()-state.mainStartedAt)),allocation_group:state.offset,awareness_guess:aware,app_version:APP_VERSION};
+   total_duration_ms:Math.max(0,Math.round(performance.now()-state.mainStartedAt)),allocation_group:state.offset,option_order_group:state.optionGroup,awareness_guess:aware,app_version:APP_VERSION};
  if(!(await sendMeta(meta))){const q=getQueue(META_QUEUE_KEY);q.push(meta);setQueue(META_QUEUE_KEY,q)}
  await flushPending();await flushMeta();
  $("doneCode").textContent=state.code;$("doneRt").textContent=(state.rts.reduce((a,b)=>a+b,0)/state.rts.length/1000).toFixed(1)+" sn";show("done");
@@ -347,7 +347,8 @@ $("startBtn").onclick=async()=>{
  try{
   const code=await allocateCode();state.grade=grade;state.code=code;state.codeNum=Number(String(code).replace(/\D/g,""))||14;state.offset=((state.codeNum-14)%5+5)%5;
   state.siteCode=sanitizeSite(new URLSearchParams(location.search).get("site"));state.deviceClass=detectDevice();state.sessionId=uuid();
-  const start=(state.codeNum-14)%5;state.optionOrder=[0,1,2,3,4].map((_,i)=>(i+start)%5);
+  state.optionGroup=Math.floor((state.codeNum-14)/5)%5;
+  state.optionOrder=[0,1,2,3,4].map((_,i)=>(i+state.optionGroup)%5);
   state.order=buildOrder();state.practicePos=0;show("practice");renderPractice();
  }catch(e){alert(e.message);btn.disabled=false;btn.textContent="Alıştırmaya Başla"}
 };
