@@ -17,7 +17,9 @@ d <- d %>%
     scenario_id = factor(scenario_id),
     grade = factor(grade),
     device_class = factor(device_class),
+    option_order_group = factor(option_order_group),
     defender_count = as.numeric(defender_count),
+    defender_f = factor(defender_count, levels = 0:4),
     public_defend = as.integer(decision == "public_defend")
   )
 
@@ -28,7 +30,7 @@ print(table(d$grade))
 
 # Birincil model: doğrusal savunucu sayısı
 m_linear <- glmer(
-  public_defend ~ defender_count + grade + device_class +
+  public_defend ~ defender_count + grade + device_class + option_order_group +
     (1 | participant_code) + (1 | scenario_id),
   data = d, family = binomial,
   control = glmerControl(optimizer = "bobyqa")
@@ -36,7 +38,7 @@ m_linear <- glmer(
 
 # Nonlineerlik sınaması: savunucu sayısını kategorik ele al
 m_factor <- glmer(
-  public_defend ~ factor(defender_count) + grade + device_class +
+  public_defend ~ defender_f + grade + device_class + option_order_group +
     (1 | participant_code) + (1 | scenario_id),
   data = d, family = binomial,
   control = glmerControl(optimizer = "bobyqa")
@@ -48,7 +50,7 @@ print(anova(m_linear, m_factor, test = "Chisq"))
 print(AIC(m_linear, m_factor))
 
 # Koşul bazında tahmini olasılıklar ve %95 GA
-emm <- emmeans(m_factor, ~ defender_count, type = "response")
+emm <- emmeans(m_factor, ~ defender_f, type = "response")
 print(emm)
 
 # Ardışık koşul karşılaştırmaları
@@ -58,7 +60,7 @@ print(adj)
 # İkincil: aktif müdahale
 d <- d %>% mutate(active_intervention = as.integer(decision %in% c("private_support","public_defend","report")))
 m_active <- glmer(
-  active_intervention ~ factor(defender_count) + grade + device_class +
+  active_intervention ~ defender_f + grade + device_class + option_order_group +
     (1 | participant_code) + (1 | scenario_id),
   data = d, family = binomial,
   control = glmerControl(optimizer = "bobyqa")
@@ -68,7 +70,7 @@ print(summary(m_active))
 # Karar süresi yalnız ikincil sonuçtur.
 rt <- d %>% filter(rt_ms >= 500, rt_ms <= 120000) %>% mutate(log_rt = log(rt_ms))
 m_rt <- lmer(
-  log_rt ~ factor(defender_count) + grade + device_class +
+  log_rt ~ defender_f + grade + device_class + option_order_group +
     (1 | participant_code) + (1 | scenario_id),
   data = rt
 )
