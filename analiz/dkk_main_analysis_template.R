@@ -1,5 +1,5 @@
 # Dijital Kritik Kütle — Ana çalışma analiz şablonu
-# Bu dosya pilot bittikten sonra kilitlenecek ana çalışma CSV'si içindir.
+# Bu dosya ana çalışma v1.0 CSV verisinin önceden tanımlı analiz şablonudur.
 # Paketler: tidyverse, lme4, emmeans, performance
 
 library(tidyverse)
