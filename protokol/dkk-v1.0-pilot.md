@@ -29,17 +29,15 @@ Koşullar:
 Karşı çıkan ve nötr akran tepkileri aynı görsel biçimde gösterilir. Renk veya vurgu yoluyla deney koşuluna ek ipucu verilmez.
 
 ## 4. Karşı çıkma ve nötr mesaj eşleştirmesi
-Karşı çıkma mesajları kısa, kişiyi aşağılamayan ve davranışa odaklanan ifadelerden oluşur:
-1. Bence böyle konuşmak doğru değil.
-2. Bu yorum bana kırıcı geldi.
-3. Kişiyi hedef almadan konuşabiliriz.
-4. Bence burada durmak daha doğru.
+Her senaryo için ayrı bir **bağlama uygun akran tepki seti** kullanılır. Böylece grup konuşmasının konusu (ör. buluşma planı, takım seçimi, proje, fotoğraf, ders çözümü) ile akran tepkileri aynı konuşma akışı içinde kalır.
 
-Nötr tepkiler değerlendirme içermeyen ve benzer uzunlukta ifadelerdir:
-1. Mesajları şimdi gördüm, buradayım.
-2. Ben de şimdi mesajları gördüm.
-3. Birazdan konuşmaya tekrar bakacağım.
-4. Tamam, ben de gruptayım.
+Her senaryoda:
+- 4 adet nötr, konuya ilişkin fakat hedef kişiyi savunmayan tepki,
+- 4 adet konuya ilişkin ve hedef kişiyi açıkça savunan/karşı çıkan tepki
+
+önceden tanımlıdır.
+
+Nötr ve karşı çıkan mesajlar mümkün olduğunca benzer uzunlukta ve aynı görsel biçimde sunulur. Ayrıca hedef alınan kişinin adı, görünür dört akran arasında yeniden kullanılmaz. Böylece örneğin dışlanan öğrencinin daha sonra savunucu akran gibi görünmesi engellenir.
 
 Hangi dört akranın kaçının karşı çıktığı katılımcı ve senaryoya bağlı deterministik tohumla dengelenir.
 
@@ -119,6 +117,7 @@ Ana çalışmadan önce 3–5 uzmandan her senaryo için şu boyutlarda 1–5 pu
 - açıklık,
 - inciticilik/şiddet düzeyi,
 - lise yaşına uygunluk,
+- akran tepkilerinin senaryo bağlamına uygunluğu,
 - yönlendiricilik riski.
 
 Uzman değerlendirmeleri gerçek uygulama olarak yapılmadan sonuç raporlanmaz.
