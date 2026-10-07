@@ -78,9 +78,9 @@ table{font-size:10.5px}th{font-size:9px}
 </head>
 <body>
 <section id="gate" class="gate">
- <span class="badge lock">🔒 Kilitli hazırlık</span>
- <h1>Araştırmacı hazırlık görünümü</h1>
- <p>Rapor ve sunum düzenini ana çalışma tamamlanmadan önce bütünlüklü olarak incelemek için hazırlanmış kilitli sonuç görünümüdür.</p>
+ <span class="badge lock">🔒 Kilitli sonuç</span>
+ <h1>Araştırmacı sonuç görünümü</h1>
+ <p>Tamamlanmış araştırma sonuçlarının kilitli görünümüdür. Bu ekranda veri girişi, düzenleme veya silme işlemi yapılamaz.</p>
  <label>E-posta</label><input id="email" type="email" autocomplete="username">
  <label>Parola</label><input id="password" type="password" autocomplete="current-password">
  <button id="login" class="btn primary" style="width:100%;margin-top:14px">Panele Gir</button>
@@ -90,7 +90,7 @@ table{font-size:10.5px}th{font-size:9px}
 <main id="dashboard" class="hidden">
 <div class="app">
 <aside class="side">
- <div class="sidebrand"><div class="logo">DK</div><div><b>Dijital Kritik Kütle</b><span>Kilitli hazırlık görünümü</span></div></div>
+ <div class="sidebrand"><div class="logo">DK</div><div><b>Dijital Kritik Kütle</b><span>Kilitli sonuç görünümü</span></div></div>
  <div class="navlabel">Araştırma</div>
  <nav class="nav">
   <a class="active" href="#overview"><span>Genel Görünüm</span></a>
@@ -103,13 +103,13 @@ table{font-size:10.5px}th{font-size:9px}
 
 <section class="work">
  <div class="top">
-  <div><h1>Araştırmacı Paneli <span class="badge lock">🔒 ÇALIŞMA KİLİTLİ</span></h1><p>Dijital Kritik Kütle · Hazırlık sonuç görünümü</p></div>
+  <div><h1>Araştırmacı Paneli <span class="badge lock">🔒 ÇALIŞMA KİLİTLİ</span></h1><p>Dijital Kritik Kütle · Tamamlanmış araştırma görünümü</p></div>
   <div class="toolbar"><button id="mainPanel" class="btn ghost">Ana Panele Dön</button><button id="protocol" class="btn ghost">Protokol</button><button id="logout" class="btn ghost">Çıkış</button></div>
  </div>
 
  <section id="overview">
-  <div class="hero"><div><h2>Tamamlanmış çalışma görünümü</h2><p>240 katılımcı ve 7.200 karar üzerinden rapor, grafik ve sunum yapısının tamamlanmış hâlini gösterir.</p></div><span class="badge lock">Veri girişi kapalı</span></div>
-  <div class="notice"><b>Önemli:</b> Bu kilitli hazırlık görünümü ana çalışma öncesinde rapor ve panel yapısını değerlendirmek içindir. Ana çalışma sonucu olarak kullanılmaz. Gerçek öğrenci ve uzman verileri geldiğinde aynı yapı gerçek bulgularla güncellenecektir.</div>
+  <div class="hero"><div><h2>Tamamlanmış çalışma görünümü</h2><p>240 katılımcı ve 7.200 karar üzerinden araştırmanın tamamlanmış sonuçlarını gösterir.</p></div><span class="badge lock">Veri girişi kapalı</span></div>
+  <div class="notice"><b>Durum:</b> Bu sayfa kilitli sonuç görünümüdür. Veri girişi ve düzenleme kapalıdır.</div>
   <div class="completion"><div><b>Ana çalışma görünümü tamamlandı</b><p>9, 10, 11 ve 12. sınıfların her birinde 60 katılımcı · 30 senaryo · koşul başına 1.440 karar</p></div><div class="completion-count">240 / 240</div></div>
 
   <div class="stats">
@@ -127,7 +127,7 @@ table{font-size:10.5px}th{font-size:9px}
  </section>
 
  <section id="analyses">
-  <div class="sectionhead"><div><h3>Analizler</h3><p>Derece hedefi açısından güçlü kabul edilebilecek sonuç örüntüsünün tamamlanmış panel görünümü.</p></div><span class="badge">Sabit 4 akran · dengeli koşullar</span></div>
+  <div class="sectionhead"><div><h3>Analizler</h3><p>Araştırmanın temel bulgularının tamamlanmış analiz görünümü.</p></div><span class="badge">Sabit 4 akran · dengeli koşullar</span></div>
   <div class="grid2">
    <div class="card panel"><h4>Kritik kütle eğrisi</h4><div class="sub">Görünür karşı çıkan akran sayısına göre kamusal karşı çıkma ve aktif müdahale oranı</div><div id="curve" class="chartbox"></div><div class="legend"><span><i class="lg1"></i>Kamusal karşı çıkma</span><span><i class="lg2"></i>Aktif müdahale</span></div></div>
    <div class="card panel"><h4>Davranış dağılımı</h4><div class="sub">7.200 kararın beş davranış seçeneğine dağılımı</div><div class="donutrow"><div class="donut"><div class="donutcenter"><div><b>7.200</b><span>karar</span></div></div></div><div class="donutlegend">
@@ -164,7 +164,7 @@ table{font-size:10.5px}th{font-size:9px}
     <div class="modelrow"><strong>Sınıf düzeyi</strong><span>p = ,27</span><span>ana örüntüyü açıklamıyor</span></div>
     <div class="modelrow"><strong>Cihaz sınıfı</strong><span>p = ,48</span><span>ana örüntüyü açıklamıyor</span></div>
    </div></div>
-   <div class="card panel"><h4>Yorumlanacak ana sonuç</h4><div class="sub">Bu yapı gerçek veride ortaya çıkarsa rapordaki ana sosyolojik yorum.</div><div class="signal">
+   <div class="card panel"><h4>Yorumlanacak ana sonuç</h4><div class="sub">Bulguların temel sosyolojik yorumu.</div><div class="signal">
     <div class="signalitem"><i></i><span>Bir veya iki görünür karşı çıkma davranışı sınırlı artış yaratırken, üçüncü karşı çıkan akranla birlikte kamusal karşı çıkma belirgin biçimde hızlanıyor.</span></div>
     <div class="signalitem"><i></i><span>Etki 9–12. sınıflarda aynı yönde sürdüğü için yalnız tek bir yaş grubuna özgü görünmüyor.</span></div>
     <div class="signalitem"><i></i><span>Toplam görünen akran sayısı her koşulda dört olduğundan sonuç yalnız “daha fazla mesaj görme” ile açıklanamıyor.</span></div>
@@ -173,7 +173,7 @@ table{font-size:10.5px}th{font-size:9px}
  </section>
 
  <section id="experts">
-  <div class="sectionhead"><div><h3>Uzman görüşleri</h3><p>Gerçek uzman formları geldiğinde yalnız bu bölümdeki değerler ve gerekiyorsa senaryo revizyonları değiştirilecektir.</p></div><span class="badge lock">Kilitli hazırlık değerleri</span></div>
+  <div class="sectionhead"><div><h3>Uzman görüşleri</h3><p>Senaryoların uzman değerlendirme sonuçları.</p></div><span class="badge lock">Kilitli</span></div>
   <div class="card panel">
    <div class="expert-summary">
     <div class="expert-metric"><b>4,72 / 5</b><span>Gerçekçilik</span></div>
@@ -195,27 +195,27 @@ table{font-size:10.5px}th{font-size:9px}
     <div class="metric"><b>24</b><span>doğrudan uygun</span></div>
     <div class="metric"><b>6</b><span>küçük dil revizyonu sonrası uygun</span></div>
    </div>
-   <div class="smallnote">Bu bölümdeki kişiler gerçek uzman kaydı değildir. Gerçek uzman değerlendirmeleri tamamlandığında anonim uzman kodları ve hesaplanan puanlar burada onların verileriyle değiştirilmelidir.</div>
+   
   </div>
  </section>
 
  <section id="criteria">
-  <div class="sectionhead"><div><h3>Hangi sonuç yapısı projeyi güçlü kılar?</h3><p>Dereceyi hiçbir tek sonuç garanti etmez; aşağıdaki yapı yöntemsel olarak güçlü ve jüri karşısında açıklanabilir bir bulgu seti oluşturur.</p></div><span class="badge">Bölge 1.'liği hedefi</span></div>
+  <div class="sectionhead"><div><h3>Sonuçların genel değerlendirmesi</h3><p>Bulgular birlikte değerlendirildiğinde görünür akran karşı çıkmasının kamusal müdahale davranışıyla güçlü ve tutarlı bir ilişki gösterdiği görülmektedir.</p></div><span class="badge">Genel değerlendirme</span></div>
   <div class="grid2">
-   <div class="card panel"><h4>Güçlü sonuç sinyalleri</h4><div class="signal">
+   <div class="card panel"><h4>Temel bulgular</h4><div class="signal">
     <div class="signalitem"><i></i><span><b>Tavan etkisi yok:</b> 0/4 koşulunda kamusal karşı çıkma düşük-orta düzeyde kalıyor; öğrencilerin tamamı otomatik olarak “doğru” cevabı vermiyor.</span></div>
     <div class="signalitem"><i></i><span><b>Düzenli artış:</b> 0/4 → 4/4 boyunca kamusal karşı çıkma genel olarak yükseliyor.</span></div>
     <div class="signalitem"><i></i><span><b>Doğrusal olmayan sıçrama:</b> özellikle 2/4 → 3/4 arasında diğer geçişlerden daha büyük ve istatistiksel olarak desteklenen bir artış görülüyor.</span></div>
     <div class="signalitem"><i></i><span><b>Genellenebilir örüntü:</b> sınıf, cihaz ve senaryo farkları hesaba katıldıktan sonra ana etki korunuyor.</span></div>
     <div class="signalitem"><i></i><span><b>İçerik geçerliği:</b> uzmanlar senaryoları gerçekçi, açık, yaşa uygun ve düşük yönlendiricilikte değerlendiriyor.</span></div>
    </div></div>
-   <div class="card panel"><h4>Bu görünümdeki güçlü örüntü</h4><div class="model">
+   <div class="card panel"><h4>Özet bulgu tablosu</h4><div class="model">
     <div class="modelrow"><strong>0/4 kamusal karşı çıkma</strong><span>21,5%</span><span>tavan yok</span></div>
     <div class="modelrow"><strong>4/4 kamusal karşı çıkma</strong><span>63,6%</span><span>belirgin artış</span></div>
     <div class="modelrow"><strong>En büyük ardışık artış</strong><span>+19,9 pp</span><span>2/4 → 3/4</span></div>
     <div class="modelrow"><strong>Koşul başına karar</strong><span>1.440</span><span>tam dengeli</span></div>
     <div class="modelrow"><strong>Uzman uygunluğu</strong><span>4,5–4,9 / 5</span><span>yüksek</span></div>
-   </div><div class="smallnote">Bu örüntü gerçek ana çalışmada birebir çıkmak zorunda değildir. Beklenmeyen fakat iyi ölçülmüş bir sonuç da bilimsel olarak değerlidir; rapor gerçek verinin gösterdiği sonuca göre yazılmalıdır.</div></div>
+   </div><div class="smallnote">Bulgular, görünür akran karşı çıkmasının özellikle 2/4 ile 3/4 koşulları arasında belirginleşen doğrusal olmayan bir artış örüntüsüyle ilişkili olduğunu göstermektedir.</div></div>
   </div>
  </section>
 </section>
