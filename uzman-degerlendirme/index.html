@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DKK Senaryo Uzman Değerlendirme Formu</title>
+<style>
+:root{--bg:#f6f8f7;--card:#fff;--ink:#17211e;--muted:#6d7874;--line:#dce5e1;--brand:#0b8f76;--brand2:#0a6f5d;--soft:#eaf6f2;--shadow:0 10px 28px rgba(28,60,50,.06)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Arial,sans-serif}.wrap{max-width:1050px;margin:auto;padding:22px 14px 40px}.top{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:14px}.top h1{margin:0;font-size:29px;letter-spacing:-.04em}.top p{margin:5px 0 0;color:var(--muted);font-size:10.5px;line-height:1.55;max-width:760px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}.meta{padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}label{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#5d6965;display:block;margin-bottom:5px}input,select,textarea{width:100%;border:1px solid #d1ddd8;border-radius:8px;padding:9px;background:#fff;font:inherit}textarea{min-height:65px;resize:vertical}.note{padding:12px 14px;margin-bottom:12px;background:#f2faf7;border:1px solid #d4e8e0;border-radius:10px;font-size:9.5px;line-height:1.55;color:#4c625a}.scenario{padding:16px;margin-bottom:10px}.scenariohead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:11px}.scenariohead h2{font-size:13px;margin:0}.room{font-size:8.5px;padding:5px 7px;border-radius:999px;background:var(--soft);color:var(--brand2);font-weight:800}.messages{display:grid;gap:6px;margin-bottom:13px}.msg{padding:8px 10px;border:1px solid #e4e9e7;background:#f7f9f8;border-radius:9px;font-size:9.5px;line-height:1.45}.msg b{margin-right:6px}.ratings{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.ratingbox{border:1px solid var(--line);border-radius:9px;padding:8px}.ratingbox span{display:block;font-size:8px;color:var(--muted);margin-bottom:5px;line-height:1.3}.ratingbox select{font-size:9px;padding:7px}.comment{margin-top:8px}.actions{position:sticky;bottom:10px;display:flex;gap:8px;justify-content:flex-end;padding:11px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);box-shadow:var(--shadow)}button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;font-weight:750;cursor:pointer}button.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+@media(max-width:760px){.meta,.ratings{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body><div class="wrap">
+<div class="top"><div><h1>Senaryo Uzman Değerlendirme Formu</h1><p>DKK v1.0 pilot öncesi 30 senaryonun gerçekçilik, açıklık, şiddet düzeyi, yaşa uygunluk ve yönlendiricilik açısından değerlendirilmesi için hazırlanmıştır. Bu form araştırma sonucu üretmez; materyal geliştirme belgesidir.</p></div></div>
+<div class="card meta">
+ <div><label>Uzman kodu / adı</label><input id="expert" placeholder="Örn. UZ-01 veya ad-soyad"></div>
+ <div><label>Uzmanlık alanı</label><input id="field" placeholder="Sosyoloji / PDR / Psikoloji / Türkçe vb."></div>
+ <div><label>Tarih</label><input id="date" type="date"></div>
+</div>
+<div class="note"><b>Puanlama:</b> 1 = çok düşük / uygun değil, 5 = çok yüksek / çok uygun. “Yönlendiricilik” maddesinde yüksek puan istenmeyen durumu ifade eder; 5 = davranış seçimini çok fazla yönlendiriyor. Uzmanlardan senaryoların gerçekçi, açık ve yaşa uygun; ancak aşırı yönlendirici olmayan yapıda olması beklenir.</div>
+<div id="list"></div>
+<div class="actions"><button id="save">Tarayıcıya Kaydet</button><button id="csv" class="primary">CSV İndir</button></div>
+</div>
+<script>
+const scenarios=[
+{id:"S01",group:"mixed",room:"11-A Sınıf Grubu",pre:[["Ece","Yarın okul çıkışı kafeye giden var mı?"],["Mert","Ben varım, 4 gibi çıkabiliriz."]],aggr:["Deniz","Selin'i çağırmayın ya, gelince ortamın tadı kaçıyor."]},
+{id:"S02",group:"mixed",room:"10-B Etüt Grubu",pre:[["Bora","Dördüncü soruyu böyle çözdüm, atıyorum."],["Naz","Benim çözüm biraz farklı."]],aggr:["Eren","Bora bunu ciddi ciddi doğru diye mi attın?"]},
+{id:"S03",group:"mixed",room:"Gezi Grubu",pre:[["Melis","Cumartesi AVM'ye kaçta geçiyoruz?"],["Aras","2 gibi buluşabiliriz."]],aggr:["Sarp","Mina gelmesin ya, her planı bozuyor."]},
+{id:"S04",group:"mixed",room:"Sınıf Story Grubu",pre:[["Duru","Sınıf fotosunu storye attım."],["Mert","Güzel olmuş bence."]],aggr:["Kaan","Ece'yi niye koydunuz, fotoğrafın havası gitmiş."]},
+{id:"S05",group:"mixed",room:"Matematik Grubu",pre:[["Arda","Matematik çözümünü gruba atıyorum."],["Ece","Ben sonra bakarım."]],aggr:["Bora","Arda bunu ciddi ciddi doğru diye mi attın?"]},
+{id:"S06",group:"mixed",room:"Sunum Grubu",pre:[["Nisa","Sunumun ilk taslağını yükledim."],["Ege","Akşam hep birlikte bakalım."]],aggr:["Kaan","Nisa'nın yaptığını kullanmayalım, yine çok kötü olmuş."]},
+{id:"S07",group:"mixed",room:"Kermes Grubu",pre:[["İrem","Kermeste kasa tarafında ben durabilirim."],["Can","Görevleri akşam netleştirelim."]],aggr:["Doruk","İrem'e kasa vermeyin, yine her şeyi karıştırır."]},
+{id:"S08",group:"mixed",room:"Okul Kulübü",pre:[["Kerem","Kulüp afişinin yeni halini attım."],["Ada","Renkler daha iyi olmuş."]],aggr:["Eren","Kerem'in yaptığını paylaşmayın, baya amatör duruyor."]},
+{id:"S09",group:"mixed",room:"Sınıf Sohbeti",pre:[["Yağmur","Bugünkü soruyu anlayan var mı?"],["Efe","Ben de çözemedim."]],aggr:["Onur","Efe'nin çözememesi şaşırtmadı zaten."]},
+{id:"S10",group:"mixed",room:"Doğum Günü Planı",pre:[["Zeynep","Doğum günü için kimler geliyor?"],["Can","Ben gelirim."]],aggr:["Duru","Mert'i çağırmasak daha iyi, ortam geriliyor."]},
+{id:"S11",group:"mixed",room:"Yakın Arkadaşlar",pre:[["Mina","Akşam Discord'a giriyor muyuz?"],["Aras","Ben 9 gibi girerim."]],aggr:["Umut","Duru gelmesin ya, onsuz daha rahat oluyor."]},
+{id:"S12",group:"mixed",room:"Mezuniyet Fotoğrafları",pre:[["Lara","Mezuniyet fotoğraflarını gruba attım."],["Poyraz","Birkaç tane çok iyi çıkmış."]],aggr:["Doruk","Ayça'nın olduğu fotoğrafları paylaşmayın, hepsini bozmuş."]},
+{id:"S13",group:"mixed",room:"Sınıf Sunum Grubu",pre:[["Deniz","Sunumda hangi konuyu seçelim?"],["Ece","Herkes bir öneri yazsın."]],aggr:["Arda","Sude'nin fikrini geçelim, zaten hep alakasız şeyler söylüyor."]},
+{id:"S14",group:"mixed",room:"Proje Grubu",pre:[["Ozan","Sonuç grafiğini dosyaya ekledim."],["Ada","Dosyada gördüm, birazdan bakarım."]],aggr:["Eren","Ozan'ınkini baştan yapalım, ondan düzgün iş çıkmıyor."]},
+{id:"S15",group:"mixed",room:"Müzik Kulübü",pre:[["Zeynep","Prova kaydını yükledim."],["Mert","Akşam dinleyelim."]],aggr:["Alp","Zeynep'in kısmını yine kayıttan çıkaralım, bütün ritmi bozuyor."]},
+{id:"S16",group:"girls",room:"Kız Voleybol Takımı",pre:[["Eylül","Yarınki maçta servis sırası aynı mı?"],["Duru","Hocanın attığı liste öyle."]],aggr:["İpek","Sude'yi ilk altıya yazmasak daha iyi, her topu kaçırıyor."]},
+{id:"S17",group:"girls",room:"Kızlar Buluşma Grubu",pre:[["Selin","Cumartesi kahveye gidelim mi?"],["Ece","Ben gelirim."]],aggr:["Duru","Melis'i çağırmayın ya, gelince bütün plan değişiyor."]},
+{id:"S18",group:"girls",room:"Kız Basketbol Takımı",pre:[["Zeynep","Antrenmandan sonra şut çalışalım mı?"],["Nisa","Ben kalırım."]],aggr:["Aylin","İrem kalmasa da olur, zaten takımı yavaşlatıyor."]},
+{id:"S19",group:"girls",room:"Kızlar Yakın Arkadaşlar",pre:[["Melis","Dün çektiğimiz videoyu yakın arkadaşlara attım."],["Sena","Ben beğendim."]],aggr:["İpek","Duru'nun olduğu kısmı keseydiniz, videoyu bozmuş."]},
+{id:"S20",group:"girls",room:"Kızlar Etkinlik Grubu",pre:[["Elif","Mezuniyet panosunu ben düzenleyebilirim."],["Buse","Fotoğrafları ben toplarım."]],aggr:["Ceren","Elif yapmasın, geçen seferki gibi çocukça olur."]},
+{id:"S21",group:"girls",room:"Kızlar Film Planı",pre:[["Ayça","Cuma film için kimler geliyor?"],["Nehir","Ben varım."]],aggr:["Dila","Sena'yı çağırmayın, her şeyde sorun çıkarıyor."]},
+{id:"S22",group:"boys",room:"Erkek Halı Saha Grubu",pre:[["Emir","Cumartesi halı saha için 8 kişi olduk."],["Berk","Kaleye kim geçecek?"]],aggr:["Kaan","Ozan gelmesin, geçen maç onun yüzünden gitti."]},
+{id:"S23",group:"boys",room:"Erkek Basketbol Takımı",pre:[["Mert","Yarın okuldan sonra basket var mı?"],["Arda","Ben gelirim."]],aggr:["Efe","Can'ı takıma almayın, topu her aldığında kaybediyor."]},
+{id:"S24",group:"boys",room:"Erkekler Oyun Ekibi",pre:[["Bora","Akşam turnuva için lobbyyi ben açarım."],["Emir","9'da gireriz."]],aggr:["Kerem","Arda'yı takıma almayın, her maç bizi düşürüyor."]},
+{id:"S25",group:"boys",room:"Erkek Futbol Takımı",pre:[["Can","Maç için forma listesini attım."],["Ege","Ben orta sahadayım."]],aggr:["Umut","Berk'i ilk 11'e yazmayın, sahada hiçbir şey yapmıyor."]},
+{id:"S26",group:"boys",room:"Erkekler Buluşma Grubu",pre:[["Mert","Pazar sahile giden var mı?"],["Efe","Ben varım."]],aggr:["Kaan","Emir'i çağırmayın, gelince ortam sıkıcı oluyor."]},
+{id:"S27",group:"boys",room:"Erkekler Turnuva Grubu",pre:[["Arda","Turnuva eşleşmeleri geldi."],["Bora","İlk maç 8'de."]],aggr:["Eren","Can oynamasın, yine bütün takımı rezil eder."]},
+{id:"S28",group:"mixed",room:"11-B Sınıf Grubu",pre:[["Zeynep","Biyoloji notlarını PDF yaptım, gruba atıyorum."],["Can","Teşekkürler."]],aggr:["Bora","Eylül'e atmayın boşuna, zaten yine anlamaz."]},
+{id:"S29",group:"mixed",room:"Okul Gezisi Grubu",pre:[["Aras","Gezi otobüsünde yerleri nasıl ayarlıyoruz?"],["İpek","Herkes istediği yere oturacakmış."]],aggr:["Kerem","Mert bizim tarafa oturmasın, bütün yolu çekemem."]},
+{id:"S30",group:"mixed",room:"Şenlik Grubu",pre:[["Sena","Şenlik için müzik listesini konuşalım mı?"],["Toprak","Herkes bir şey yazsın."]],aggr:["Rüzgar","Beril'in önerilerini geçelim, zevki hiç uymuyor."]}
+];
+const KEY="dkk_expert_review_v1";const $=id=>document.getElementById(id);
+const fields=[["realism","Gerçekçilik"],["clarity","Açıklık"],["severity","İnciticilik / şiddet düzeyi"],["suitability","Lise yaşına uygunluk"],["leading","Yönlendiricilik riski"]];
+function esc(v){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function render(){
+ $("list").innerHTML=scenarios.map((s,i)=>'<section class="card scenario" data-i="'+i+'"><div class="scenariohead"><h2>'+s.id+'</h2><span class="room">'+esc(s.room)+'</span></div><div class="messages">'+s.pre.map(x=>'<div class="msg"><b>'+esc(x[0])+':</b>'+esc(x[1])+'</div>').join("")+'<div class="msg"><b>'+esc(s.aggr[0])+':</b>'+esc(s.aggr[1])+'</div></div><div class="ratings">'+fields.map(f=>'<div class="ratingbox"><span>'+f[1]+'</span><select data-k="'+f[0]+'"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>').join("")+'</div><div class="comment"><label>Not / öneri</label><textarea data-k="note" placeholder="İfade, bağlam veya dengeyle ilgili öneriniz..."></textarea></div></section>').join("");
+ load();
+}
+function collect(){return{expert:$("expert").value,field:$("field").value,date:$("date").value,ratings:[...document.querySelectorAll(".scenario")].map((el,i)=>{const o={scenario_id:scenarios[i].id};el.querySelectorAll("[data-k]").forEach(x=>o[x.dataset.k]=x.value);return o})}}
+function save(){localStorage.setItem(KEY,JSON.stringify(collect()));alert("Değerlendirme bu tarayıcıya kaydedildi.")}
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(!d)return;$("expert").value=d.expert||"";$("field").value=d.field||"";$("date").value=d.date||"";d.ratings?.forEach((r,i)=>{const el=document.querySelector('.scenario[data-i="'+i+'"]');if(!el)return;Object.entries(r).forEach(([k,v])=>{const x=el.querySelector('[data-k="'+k+'"]');if(x)x.value=v})})}catch(e){}}
+function csvEsc(v){v=String(v??"");return/[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+$("save").onclick=save;$("csv").onclick=()=>{const d=collect(),cols=["expert","expertise","date","scenario_id","realism","clarity","severity","suitability","leading","note"],lines=[cols.join(",")];d.ratings.forEach(r=>lines.push([d.expert,d.field,d.date,r.scenario_id,r.realism,r.clarity,r.severity,r.suitability,r.leading,r.note].map(csvEsc).join(",")));const b=new Blob(["\ufeff"+lines.join("\n")],{type:"text/csv;charset=utf-8"}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="DKK_uzman_degerlendirme_"+(d.expert||"uzman")+".csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),500)};
+render();
+</script></body></html>
