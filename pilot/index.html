@@ -106,6 +106,8 @@ select:focus{border-color:#82c6b5;box-shadow:0 0 0 4px rgba(11,143,118,.08)}
   <div class="practicebox"><div><div class="smallchat" id="practiceMessages"></div></div><div class="decision"><div class="kicker">Alıştırma kararı</div><h3>Bu konuşmada sen olsaydın hangisini yapmaya daha yakın olurdun?</h3><div id="practiceChoices" class="choices"></div></div></div>
 </section>
 
+<section id="prepare" class="screen card break"><div class="pausebox"><div class="count" style="font-size:34px">Hazırlanıyor</div><h2>Oturum hazırlanıyor</h2><p id="prepareText">Anonim katılımcı kodunuz güvenli biçimde oluşturuluyor.</p><button id="retryCodeBtn" class="btn primary hidden" style="max-width:280px">Tekrar Dene</button></div></section>
+
 <section id="study" class="screen card study">
   <div class="studybar"><div class="studybar-row"><b>Dijital Grup İletişimi</b><span id="progressText">1 / 30</span></div><div class="progress"><i id="progressFill"></i></div></div>
   <div class="studygrid">
@@ -143,7 +145,7 @@ const SUPABASE_URL="https://urawvamivtcqhztfdazn.supabase.co";
 const SUPABASE_KEY="sb_publishable_-fHeoH2uk6W4NZvSpirgOQ_hdrWzCn3";
 const RESPONSE_URL=SUPABASE_URL+"/rest/v1/pilot_v1_responses";
 const META_URL=SUPABASE_URL+"/rest/v1/pilot_v1_session_meta";
-const APP_VERSION="dkk-v1.0-pilot";
+const APP_VERSION="dkk-v1.0-pilot.1";
 const CONDITION_VERSION="fixed-peer-4-balanced-v1";
 const QUEUE_KEY="dkk_v1_pilot_pending";
 const META_QUEUE_KEY="dkk_v1_pilot_meta_pending";
@@ -213,7 +215,7 @@ const namePools={
  boys:["Mert","Arda","Efe","Can","Berk","Emir","Bora","Kerem","Ege","Umut","Ozan","Alp"]
 };
 
-let state={grade:null,code:null,sessionId:null,codeNum:0,offset:0,optionGroup:0,siteCode:"OKUL-A",deviceClass:"desktop",order:[],pos:0,practicePos:0,scenarioStartedAt:0,mainStartedAt:0,rts:[],optionOrder:[]};
+let state={grade:null,code:null,codePromise:null,codeError:null,sessionId:null,codeNum:0,offset:0,optionGroup:0,siteCode:"OKUL-A",deviceClass:"desktop",order:[],pos:0,practicePos:0,scenarioStartedAt:0,mainStartedAt:0,rts:[],optionOrder:[]};
 
 function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");window.scrollTo({top:0,behavior:"auto"})}
 function sanitizeSite(v){v=(v||"OKUL-A").toUpperCase().replace(/[^A-Z0-9_-]/g,"").slice(0,24);return v||"OKUL-A"}
@@ -268,7 +270,12 @@ function renderChoiceButtons(container,onClick){
 }
 function setSync(text,cls){$("sync").textContent=text;$("sync").className="sync "+(cls||"")}
 async function ping(){
- try{const r=await fetch(SUPABASE_URL+"/rest/v1/",{headers:{"apikey":SUPABASE_KEY}});setSync(r.ok?"Bağlantı hazır":"Bağlantı sınırlı",r.ok?"ok":"bad")}catch(e){setSync("Çevrimdışı","bad")}
+ try{
+   const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),5000);
+   const r=await fetch(SUPABASE_URL+"/rest/v1/pilot_v1_responses?select=id&limit=1",{headers:{"apikey":SUPABASE_KEY},signal:ctl.signal});
+   clearTimeout(t);
+   setSync(r.ok?"Bağlantı hazır":"Bağlantı sınırlı",r.ok?"ok":"bad");
+ }catch(e){setSync(navigator.onLine?"Bağlantı gecikiyor":"Çevrimdışı","bad")}
 }
 function getQueue(key){try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(e){return[]}}
 function setQueue(key,v){localStorage.setItem(key,JSON.stringify(v))}
@@ -301,9 +308,40 @@ async function flushMeta(){
  setQueue(META_QUEUE_KEY,keep)
 }
 async function allocateCode(){
- const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/next_pilot_v1_participant_code",{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},body:"{}"});
- if(!r.ok)throw new Error("Katılımcı kodu oluşturulamadı.");
- return await r.json();
+ let lastErr=null;
+ for(let attempt=1;attempt<=2;attempt++){
+   const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),7000);
+   try{
+     const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/next_pilot_v1_participant_code",{
+       method:"POST",
+       headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},
+       body:"{}",
+       signal:ctl.signal
+     });
+     clearTimeout(timer);
+     if(!r.ok)throw new Error("Kod servisi yanıt vermedi ("+r.status+").");
+     const value=await r.json();
+     if(!/^K\d+$/.test(String(value)))throw new Error("Geçersiz katılımcı kodu alındı.");
+     return String(value);
+   }catch(e){
+     clearTimeout(timer);lastErr=e;
+     if(attempt<2)await new Promise(res=>setTimeout(res,700));
+   }
+ }
+ throw new Error(lastErr?.name==="AbortError"?"Katılımcı kodu servisine ulaşılamadı. İnternet bağlantısını kontrol edip tekrar deneyin.":(lastErr?.message||"Katılımcı kodu oluşturulamadı."));
+}
+async function allocateAndPrepare(){
+ state.codeError=null;
+ try{
+   const code=await allocateCode();
+   state.code=code;
+   state.codeNum=Number(String(code).replace(/\D/g,""))||14;
+   state.offset=((state.codeNum-14)%5+5)%5;
+   state.optionGroup=Math.floor((state.codeNum-14)/5)%5;
+   state.optionOrder=[0,1,2,3,4].map((_,i)=>(i+state.optionGroup)%5);
+   state.order=buildOrder();
+   return code;
+ }catch(e){state.codeError=e;return null}
 }
 function uuid(){return crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==="x"?r:(r&3|8);return v.toString(16)})}
 
@@ -313,7 +351,18 @@ function renderPractice(){
  renderMsgs($("practiceMessages"),s,practiceCondition());
  renderChoiceButtons($("practiceChoices"),()=>{state.practicePos++;if(state.practicePos<2)renderPractice();else beginMain()});
 }
-function beginMain(){state.mainStartedAt=performance.now();state.pos=0;show("study");renderScenario()}
+async function beginMain(){
+ show("prepare");$("retryCodeBtn").classList.add("hidden");$("prepareText").textContent="Anonim katılımcı kodunuz güvenli biçimde oluşturuluyor.";
+ if(!state.code){
+   if(!state.codePromise)state.codePromise=allocateAndPrepare();
+   await state.codePromise;
+ }
+ if(!state.code){
+   $("prepareText").textContent=(state.codeError?.message||"Katılımcı kodu oluşturulamadı.")+" Bu alıştırma yanıtları kaydedilmedi; güvenle tekrar deneyebilirsiniz.";
+   $("retryCodeBtn").classList.remove("hidden");return;
+ }
+ state.mainStartedAt=performance.now();state.pos=0;show("study");renderScenario();
+}
 function renderScenario(){
  const idx=state.order[state.pos],s=scenarios[idx],cond=conditionForScenario(idx);
  $("progressText").textContent=(state.pos+1)+" / 30";$("progressFill").style.width=(state.pos/30*100)+"%";$("room").textContent=s.room;
@@ -332,6 +381,7 @@ function renderScenario(){
  });
 }
 $("continueBtn").onclick=()=>{show("study");renderScenario()};
+$("retryCodeBtn").onclick=async()=>{$("retryCodeBtn").classList.add("hidden");$("prepareText").textContent="Bağlantı yeniden deneniyor…";state.codePromise=allocateAndPrepare();await state.codePromise;beginMain()};
 document.querySelectorAll('input[name="aware"]').forEach(x=>x.addEventListener("change",()=>{$("finishBtn").disabled=false}));
 $("finishBtn").onclick=async()=>{
  const aware=document.querySelector('input[name="aware"]:checked')?.value||"unsure";
@@ -341,16 +391,12 @@ $("finishBtn").onclick=async()=>{
  await flushPending();await flushMeta();
  $("doneCode").textContent=state.code;$("doneRt").textContent=(state.rts.reduce((a,b)=>a+b,0)/state.rts.length/1000).toFixed(1)+" sn";show("done");
 };
-$("startBtn").onclick=async()=>{
+$("startBtn").onclick=()=>{
  const grade=Number($("grade").value);if(!grade){alert("Sınıf düzeyini seçin.");return}if(!$("consent").checked){alert("Devam etmek için bilgilendirmeyi okuyup onay kutusunu işaretleyin.");return}
- const btn=$("startBtn");btn.disabled=true;btn.textContent="Kod atanıyor…";
- try{
-  const code=await allocateCode();state.grade=grade;state.code=code;state.codeNum=Number(String(code).replace(/\D/g,""))||14;state.offset=((state.codeNum-14)%5+5)%5;
-  state.siteCode=sanitizeSite(new URLSearchParams(location.search).get("site"));state.deviceClass=detectDevice();state.sessionId=uuid();
-  state.optionGroup=Math.floor((state.codeNum-14)/5)%5;
-  state.optionOrder=[0,1,2,3,4].map((_,i)=>(i+state.optionGroup)%5);
-  state.order=buildOrder();state.practicePos=0;show("practice");renderPractice();
- }catch(e){alert(e.message);btn.disabled=false;btn.textContent="Alıştırmaya Başla"}
+ state.grade=grade;state.siteCode=sanitizeSite(new URLSearchParams(location.search).get("site"));state.deviceClass=detectDevice();state.sessionId=uuid();
+ state.code=null;state.codeError=null;state.codePromise=allocateAndPrepare();
+ state.practicePos=0;state.rts=[];$("startBtn").textContent="Alıştırmaya Başla";$("startBtn").disabled=false;
+ show("practice");renderPractice();
 };
 window.addEventListener("online",()=>{ping();flushPending();flushMeta()});window.addEventListener("offline",()=>setSync("Çevrimdışı","bad"));
 ping();flushPending();flushMeta();
