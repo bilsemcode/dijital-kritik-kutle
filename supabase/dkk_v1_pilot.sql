@@ -15,6 +15,7 @@ create table if not exists public.pilot_v1_responses (
   order_no smallint not null check (order_no between 1 and 30),
   defender_count smallint not null check (defender_count between 0 and 4),
   peer_total smallint not null default 4 check (peer_total = 4),
+  allocation_group smallint check (allocation_group between 0 and 4),
   decision text not null check (decision in ('support_aggressor','silent','private_support','public_defend','report')),
   decision_kind text not null check (decision_kind in ('destek','pasif','aktif')),
   rt_ms integer not null check (rt_ms >= 0),
@@ -33,6 +34,7 @@ create table if not exists public.pilot_v1_session_meta (
   site_code text not null default 'OKUL-A',
   device_class text not null check (device_class in ('mobile','tablet','desktop')),
   total_duration_ms integer not null check (total_duration_ms >= 0),
+  allocation_group smallint check (allocation_group between 0 and 4),
   awareness_guess text,
   completed_at timestamptz not null default now(),
   app_version text not null default 'dkk-v1.0-pilot'
