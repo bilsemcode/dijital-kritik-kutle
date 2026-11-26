@@ -152,7 +152,7 @@ body{font-size:16px}
 
 <section id="done" class="screen card done">
   <h2>Uygulama tamamlandı</h2>
-  <p>Katılımınız için teşekkür ederiz. Yanıtlarınız anonim katılımcı koduyla kaydedildi.</p>
+  <p>Katılımınız için teşekkür ederiz.</p><p id="doneStatus" role="status"></p><button id="retrySyncBtn" class="btn ghost" hidden>Bekleyen kayıtları tekrar gönder</button>
   <div class="debrief"><b>Uygulama sonu açıklaması:</b> Araştırmada bazı senaryolarda diğer grup üyelerinin görünür tepkileri sistematik olarak değiştirilmiştir. Amaç, çevrimiçi bir grupta görülen akran tepkilerinin bireysel davranış tercihleriyle ilişkisini incelemektir. Veri toplama sürüyorsa senaryo düzeninin ayrıntılarını diğer katılımcılarla paylaşmamanız araştırmanın sağlığı açısından önemlidir.</div>
   <div class="done-grid"><div class="done-stat"><b id="doneCode">—</b><span>Katılımcı kodu</span></div><div class="done-stat"><b>30</b><span>Tamamlanan senaryo</span></div><div class="done-stat"><b id="doneRt">—</b><span>Ort. karar süresi</span></div></div>
 </section>
@@ -327,36 +327,68 @@ async function ping(){
    setSync(r.ok?"Bağlantı hazır":"Bağlantı denetlenemedi",r.ok?"ok":"bad");
  }catch(e){setSync(navigator.onLine?"Bağlantı gecikiyor":"Çevrimdışı","bad")}
 }
-function getQueue(key){try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(e){return[]}}
-function setQueue(key,v){localStorage.setItem(key,JSON.stringify(v))}
-async function sendResponse(row){
+// Durable per-record queue; network requests never block question transitions.
+const flushing=new Map(), cursors=new Map();
+function recordKey(key,row){return key+":"+row.session_id+(key===QUEUE_KEY?":"+row.scenario_id:"")}
+function putPending(key,row){localStorage.setItem(recordKey(key,row),JSON.stringify(row))}
+function pending(key){
+ const legacy=localStorage.getItem(key);
+ if(legacy!==null){
+  const rows=JSON.parse(legacy);if(!Array.isArray(rows))throw Error("Invalid legacy queue");
+  for(const row of rows)if(localStorage.getItem(recordKey(key,row))===null)putPending(key,row);
+  if(localStorage.getItem(key)===legacy)localStorage.removeItem(key);
+ }
+ const entries=[];
+ for(let i=0;i<localStorage.length;i++){
+  const k=localStorage.key(i);if(!k||!k.startsWith(key+":"))continue;
+  const raw=localStorage.getItem(k);if(raw!==null)entries.push({k,raw,row:JSON.parse(raw)});
+ }
+ return entries;
+}
+function refreshSync(){
  try{
-   const r=await fetch(RESPONSE_URL,{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(row)});
-   if(r.ok||r.status===409)return true;
- }catch(e){}
+  const rows=[...pending(QUEUE_KEY),...pending(META_QUEUE_KEY)];
+  setSync(rows.length?"Bekleyen kayıt: "+rows.length:"Bekleyen kayıt yok",rows.length?"bad":"ok");
+  if($("done").classList.contains("active")){
+   const n=rows.filter(x=>x.row.session_id===state.sessionId).length;
+   $("doneStatus").textContent=n?"Yanıtlar cihazda saklandı; sunucuya aktarılmayı bekleyen "+n+" kayıt var. Sayfayı açık tutun.":"Bu oturumun kayıtları sunucuya aktarıldı.";
+   $("retrySyncBtn").hidden=!n;
+  }
+ }catch(e){console.error("DKK queue",e);setSync("Yerel kayıt denetlenemedi","bad")}
+}
+async function sendRow(url,row,meta){
+ const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),7000);
+ try{
+  const r=await fetch(url,{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(row),signal:ctl.signal});
+  if(r.ok)return true;
+  const err=await r.json().catch(()=>({}));
+  if(r.status===409&&err.code==="23505"){
+   const d=String(err.details||"");
+   if(meta?/\(session_id\)=/.test(d):/\(session_id,\s*scenario_id\)=|\(scenario_id,\s*session_id\)=/.test(d))return true;
+  }
+  console.warn("DKK HTTP",r.status,err.code||"");
+ }catch(e){console.warn("DKK bağlantı",e.name||"Error")}
+ finally{clearTimeout(t)}
  return false;
 }
-async function flushPending(){
- const q=getQueue(QUEUE_KEY),keep=[];
- for(const row of q){if(!(await sendResponse(row)))keep.push(row)}
- setQueue(QUEUE_KEY,keep);
- setSync(keep.length?"Bekleyen kayıt: "+keep.length:"Tüm kayıtlar senkron",keep.length?"bad":"ok");
+async function drain(key,url){
+ let rows=pending(key);if(!rows.length)return;
+ const cursor=(cursors.get(key)||0)%rows.length;
+ rows=rows.slice(cursor).concat(rows.slice(0,cursor)).slice(0,8);cursors.set(key,cursor+rows.length);
+ for(const x of rows)if(await sendRow(url,x.row,key===META_QUEUE_KEY)){
+  if(localStorage.getItem(x.k)===x.raw)localStorage.removeItem(x.k);
+ }
 }
-async function queueResponse(row){
- const q=getQueue(QUEUE_KEY);q.push(row);setQueue(QUEUE_KEY,q);await flushPending()
+function flushQueue(key,url){
+ if(flushing.has(key))return flushing.get(key);
+ const run=()=>navigator.locks?navigator.locks.request("dkk-flush:"+key,()=>drain(key,url)):drain(key,url);
+ const p=Promise.resolve().then(run).catch(e=>console.error("DKK sync",e)).finally(()=>{flushing.delete(key);refreshSync()});
+ flushing.set(key,p);return p;
 }
-async function sendMeta(meta){
- try{
-  const r=await fetch(META_URL,{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(meta)});
-  if(r.ok||r.status===409)return true;
- }catch(e){}
- return false;
-}
-async function flushMeta(){
- const q=getQueue(META_QUEUE_KEY),keep=[];
- for(const m of q){if(!(await sendMeta(m)))keep.push(m)}
- setQueue(META_QUEUE_KEY,keep)
-}
+function flushPending(){return flushQueue(QUEUE_KEY,RESPONSE_URL)}
+function flushMeta(){return flushQueue(META_QUEUE_KEY,META_URL)}
+function syncAll(){void flushPending();void flushMeta()}
+function queueResponse(row){putPending(QUEUE_KEY,row);refreshSync();void flushPending()}
 async function allocateCode(){
  let lastErr=null;
  for(let attempt=1;attempt<=2;attempt++){
@@ -418,13 +450,17 @@ function renderScenario(){
  $("progressText").textContent=(state.pos+1)+" / 30";$("progressFill").style.width=(state.pos/30*100)+"%";$("room").textContent=s.room;
  renderMsgs($("messages"),s,cond);$("note").textContent="Bir seçenek seçin.";
  state.scenarioStartedAt=performance.now();
- renderChoiceButtons($("choices"),async(c,b)=>{
+ renderChoiceButtons($("choices"),(c,b)=>{
   document.querySelectorAll("#choices .choice").forEach(x=>x.disabled=true);
-  const rt=Math.max(0,Math.round(performance.now()-state.scenarioStartedAt));state.rts.push(rt);
+  const rt=Math.max(0,Math.round(performance.now()-state.scenarioStartedAt));
   const row={session_id:state.sessionId,participant_code:state.code,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass,
     scenario_id:s.id,order_no:state.pos+1,defender_count:cond,peer_total:4,allocation_group:state.offset,option_order_group:state.optionGroup,decision:c.value,decision_kind:c.kind,rt_ms:rt,
     study_phase:"main",app_version:APP_VERSION,condition_version:CONDITION_VERSION,client_timestamp:new Date().toISOString()};
-  $("note").textContent="Kaydediliyor…";await queueResponse(row);state.pos++;
+  try{queueResponse(row)}catch(e){
+   console.error("DKK storage",e);$("note").textContent="Yanıt cihazda kaydedilemedi. Depolama iznini kontrol edip tekrar seçin.";
+   document.querySelectorAll("#choices .choice").forEach(x=>x.disabled=false);return;
+  }
+  state.rts.push(rt);state.pos++;
   if(state.pos===10||state.pos===20){$("breakCount").textContent=state.pos+"/30";show("break");return}
   if(state.pos>=30){$("progressFill").style.width="100%";show("awareness");return}
   renderScenario();
@@ -433,13 +469,15 @@ function renderScenario(){
 $("continueBtn").onclick=()=>{show("study");renderScenario()};
 $("retryCodeBtn").onclick=async()=>{$("retryCodeBtn").classList.add("hidden");$("prepareText").textContent="Bağlantı yeniden deneniyor…";state.codePromise=allocateAndPrepare();await state.codePromise;beginMain()};
 document.querySelectorAll('input[name="aware"]').forEach(x=>x.addEventListener("change",()=>{$("finishBtn").disabled=false}));
-$("finishBtn").onclick=async()=>{
+$("finishBtn").onclick=()=>{
+ $("finishBtn").disabled=true;
  const aware=document.querySelector('input[name="aware"]:checked')?.value||"unsure";
  const meta={session_id:state.sessionId,participant_code:state.code,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass,
    total_duration_ms:Math.max(0,Math.round(performance.now()-state.mainStartedAt)),allocation_group:state.offset,option_order_group:state.optionGroup,awareness_guess:aware,app_version:APP_VERSION};
- if(!(await sendMeta(meta))){const q=getQueue(META_QUEUE_KEY);q.push(meta);setQueue(META_QUEUE_KEY,q)}
- await flushPending();await flushMeta();
- $("doneCode").textContent=state.code;$("doneRt").textContent=(state.rts.reduce((a,b)=>a+b,0)/state.rts.length/1000).toFixed(1)+" sn";show("done");
+ try{putPending(META_QUEUE_KEY,meta)}catch(e){
+  $("finishBtn").disabled=false;alert("Oturum cihazda kaydedilemedi. Depolama iznini kontrol edin.");return;
+ }
+ $("doneCode").textContent=state.code;$("doneRt").textContent=(state.rts.reduce((a,b)=>a+b,0)/state.rts.length/1000).toFixed(1)+" sn";show("done");refreshSync();syncAll();
 };
 $("startBtn").onclick=()=>{
  const grade=Number($("grade").value);if(!grade){alert("Sınıf düzeyini seçin.");return}if(!$("consent").checked){alert("Devam etmek için bilgilendirmeyi okuyup onay kutusunu işaretleyin.");return}
@@ -448,8 +486,10 @@ $("startBtn").onclick=()=>{
  state.practicePos=0;state.rts=[];$("startBtn").textContent="Alıştırmaya Başla";$("startBtn").disabled=false;
  show("practice");renderPractice();
 };
-window.addEventListener("online",()=>{ping();flushPending();flushMeta()});window.addEventListener("offline",()=>setSync("Çevrimdışı","bad"));
-ping();flushPending();flushMeta();
+$("retrySyncBtn").onclick=syncAll;
+window.addEventListener("online",()=>{ping();syncAll()});window.addEventListener("offline",()=>setSync("Çevrimdışı","bad"));
+window.addEventListener("storage",e=>{if(e.key&&(e.key.startsWith(QUEUE_KEY)||e.key.startsWith(META_QUEUE_KEY)))refreshSync()});
+setInterval(syncAll,15000);ping();syncAll();
 </script>
 </body>
 </html>
