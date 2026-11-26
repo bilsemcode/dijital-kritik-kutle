@@ -99,7 +99,7 @@ body{font-size:16px}
 <div class="shell">
 <header class="top">
   <div class="brand"><div class="logo">DG</div><div><b>Dijital Grup İletişimi</b><span>Katılımcı uygulaması · Ana Çalışma v1.0</span></div></div>
-  <div id="sync" class="sync">Bağlantı kontrol ediliyor</div>
+  <div id="testNotice" hidden style="padding:10px;border:1px solid #e6b665;border-radius:8px;background:#fff4d9;font-weight:700;color:#875500">TEST MODU · Gerçek araştırma verilerine dahil edilmez.</div><div id="sync" class="sync">Bağlantı kontrol ediliyor</div>
 </header>
 
 <section id="start" class="screen active card start">
@@ -167,10 +167,12 @@ const SUPABASE_URL="https://urawvamivtcqhztfdazn.supabase.co";
 const SUPABASE_KEY="sb_publishable_-fHeoH2uk6W4NZvSpirgOQ_hdrWzCn3";
 const RESPONSE_URL=SUPABASE_URL+"/rest/v1/main_v1_responses";
 const META_URL=SUPABASE_URL+"/rest/v1/main_v1_session_meta";
+const TEST_MODE=new URLSearchParams(location.search).get("test")==="1";
 const APP_VERSION="dkk-v1.0-main";
 const CONDITION_VERSION="fixed-peer-4-balanced-v1";
 const QUEUE_KEY="dkk_v1_main_pending";
 const META_QUEUE_KEY="dkk_v1_main_meta_pending";
+let testKey="";
 const $=id=>document.getElementById(id);
 
 const scenarios=[
@@ -317,7 +319,7 @@ function renderChoiceButtons(container,onClick){
 }
 function setSync(text,cls){$("sync").textContent=text;$("sync").className="sync "+(cls||"")}
 async function ping(){
- if(SHEETS_ENDPOINT){try{await sheetRequest("health",{});sheetHealth="ready"}catch(e){sheetHealth="failed"}refreshSync();return}
+ if(SHEETS_ENDPOINT){try{const health=await sheetRequest("health",{});if(TEST_MODE&&health.revision!=="dkk-sheets-v2")throw Error("Test API not deployed");sheetHealth="ready"}catch(e){sheetHealth="failed"}refreshSync();return}
  try{
    const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),5000);
    const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/main_v1_health",{
@@ -374,8 +376,8 @@ async function sheetRequest(action,data){
 }
 async function sendRow(url,row,meta){
  if(row.__dkk_sheets===true){
-  const {__dkk_sheets,__dkk_token,...data}=row;
-  try{await sheetRequest(meta?"meta":"response",{row:data,token:__dkk_token});return true}
+  const {__dkk_sheets,__dkk_token,__dkk_test,...data}=row;
+  try{await sheetRequest((__dkk_test?"test_":"")+(meta?"meta":"response"),{row:data,token:__dkk_token});return true}
   catch(e){console.warn("DKK Sheets",e.name||"Error");return false}
  }
  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),7000);
@@ -409,11 +411,11 @@ function flushQueue(key,url){
 function flushPending(){return flushQueue(QUEUE_KEY,RESPONSE_URL)}
 function flushMeta(){return flushQueue(META_QUEUE_KEY,META_URL)}
 function syncAll(){void flushPending();void flushMeta()}
-function backendRow(row){return SHEETS_ENDPOINT?{...row,__dkk_sheets:true,__dkk_token:state.sheetToken}:row}
+function backendRow(row){return SHEETS_ENDPOINT?{...row,__dkk_sheets:true,__dkk_token:state.sheetToken,__dkk_test:TEST_MODE}:row}
 function queueResponse(row){putPending(QUEUE_KEY,backendRow(row));refreshSync();void flushPending()}
 async function allocateCode(){
  if(SHEETS_ENDPOINT){
-  let lastErr;for(let i=0;i<2;i++){try{const r=await sheetRequest("allocate",{session_id:state.sessionId,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass});if(!/^K\d+$/.test(r.code)||typeof r.token!=="string"||!r.token)throw Error("Geçersiz katılımcı kodu.");state.sheetToken=r.token;sheetHealth="ready";refreshSync();return r.code}catch(e){lastErr=e;if(i===0)await new Promise(res=>setTimeout(res,700))}}
+  let lastErr;for(let i=0;i<2;i++){try{const r=await sheetRequest(TEST_MODE?"test_allocate":"allocate",{session_id:state.sessionId,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass,...(TEST_MODE?{key:testKey}:{})});if(!/^K\d+$/.test(r.code)||typeof r.token!=="string"||!r.token)throw Error("Geçersiz katılımcı kodu.");state.sheetToken=r.token;testKey="";sheetHealth="ready";refreshSync();return r.code}catch(e){lastErr=e;if(i===0)await new Promise(res=>setTimeout(res,700))}}
   sheetHealth="failed";refreshSync();throw Error("Google Sheets katılımcı kodu alınamadı. Bağlantıyı ve araştırmacının web uygulaması kurulumunu kontrol edip tekrar deneyin.");
  }
  let lastErr=null;
@@ -493,7 +495,7 @@ function renderScenario(){
  });
 }
 $("continueBtn").onclick=()=>{show("study");renderScenario()};
-$("retryCodeBtn").onclick=async()=>{$("retryCodeBtn").classList.add("hidden");$("prepareText").textContent="Bağlantı yeniden deneniyor…";state.codePromise=allocateAndPrepare();await state.codePromise;beginMain()};
+$("retryCodeBtn").onclick=async()=>{if(TEST_MODE&&!testKey){testKey=(prompt("Test erişim anahtarını girin.")||"").trim();if(!testKey)return;}$("retryCodeBtn").classList.add("hidden");$("prepareText").textContent="Bağlantı yeniden deneniyor…";state.codePromise=allocateAndPrepare();await state.codePromise;beginMain()};
 document.querySelectorAll('input[name="aware"]').forEach(x=>x.addEventListener("change",()=>{$("finishBtn").disabled=false}));
 $("finishBtn").onclick=()=>{
  $("finishBtn").disabled=true;
@@ -507,12 +509,14 @@ $("finishBtn").onclick=()=>{
 };
 $("startBtn").onclick=()=>{
  const grade=Number($("grade").value);if(!grade){alert("Sınıf düzeyini seçin.");return}if(!$("consent").checked){alert("Devam etmek için bilgilendirmeyi okuyup onay kutusunu işaretleyin.");return}
- state.grade=grade;state.siteCode=sanitizeSite(new URLSearchParams(location.search).get("site"));state.deviceClass=detectDevice();state.sessionId=uuid();
+ if(TEST_MODE){testKey=prompt("TEST MODU: Araştırmacı erişim anahtarını girin.")||"";if(!testKey.trim())return;testKey=testKey.trim()}
+ state.grade=grade;state.siteCode=TEST_MODE?"DKK-TEST":sanitizeSite(new URLSearchParams(location.search).get("site"));if(!TEST_MODE&&state.siteCode==="DKK-TEST"){alert("Test oturumu için test bağlantısını kullanın.");return}state.deviceClass=detectDevice();state.sessionId=uuid();
  state.code=null;state.sheetToken=null;state.codeError=null;state.codePromise=allocateAndPrepare();
  state.practicePos=0;state.rts=[];$("startBtn").textContent="Alıştırmaya Başla";$("startBtn").disabled=false;
  show("practice");renderPractice();
 };
 $("retrySyncBtn").onclick=syncAll;
+if(TEST_MODE){$("testNotice").hidden=false;document.title="TEST · Dijital Kritik Kütle";}
 window.addEventListener("online",()=>{ping();syncAll()});window.addEventListener("offline",()=>setSync("Çevrimdışı","bad"));
 window.addEventListener("storage",e=>{if(e.key&&(e.key.startsWith(QUEUE_KEY)||e.key.startsWith(META_QUEUE_KEY)))refreshSync()});
 setInterval(syncAll,15000);ping();syncAll();
