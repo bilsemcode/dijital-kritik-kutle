@@ -47,7 +47,7 @@ table{font-size:10.5px}th{font-size:9px}.note{font-size:10px}
 <body>
 <section id="gate" class="gate">
  <span class="badge">DKK v1.0 Ana Çalışma</span><h1>Araştırmacı Paneli</h1><p>Ana çalışmanın veri kalitesini, koşul dengesini, senaryo performansını ve yöntem bütünlüğünü izlemek için kullanılır.</p>
- <label>E-posta</label><input id="email" type="email" autocomplete="username"><label>Parola</label><input id="password" type="password" autocomplete="current-password">
+ <label>Araştırmacı erişim anahtarı</label><input id="password" type="password" autocomplete="off" spellcheck="false"><p>Google Apps Script üzerinden oluşturulan özel erişim anahtarınızı girin. Anahtarınızı paylaşmayın.</p>
  <button id="login" class="btn primary" style="width:100%;margin-top:14px">Giriş Yap</button><div id="loginError" style="min-height:18px;margin-top:7px;color:#a35d69;font-size:9px"></div>
 </section>
 
@@ -65,7 +65,7 @@ table{font-size:10.5px}th{font-size:9px}.note{font-size:10px}
  <div class="sidefoot">Ana çalışma veri görünümü.<br>Hedef: 240 tamamlanmış katılımcı.</div>
 </aside>
 <section class="work">
- <div class="top"><div><h1>Dijital Kritik Kütle · Ana Çalışma v1.0</h1><p>Sabit 4 akran tepkisi · dengeli koşullar · nötr seçenek dili</p></div><div class="toolbar"><button id="openPrep" class="btn ghost">Hazırlık (Kilitli)</button><button id="openPilot" class="btn ghost">Katılımcı Uygulaması</button><button id="openExpert" class="btn ghost">Uzman Formu</button><button id="openProtocol" class="btn ghost">Protokol</button><button id="openExhibit" class="btn ghost">Sergi Modu</button><button id="refresh" class="btn ghost">Yenile</button><button id="download" class="btn primary">CSV</button><button id="reset" class="btn ghost">Ana Veriyi Sıfırla</button><button id="logout" class="btn ghost">Çıkış</button></div></div>
+ <div class="top"><div><h1>Dijital Kritik Kütle · Ana Çalışma v1.0</h1><p>Sabit 4 akran tepkisi · dengeli koşullar · nötr seçenek dili</p></div><div class="toolbar"><button id="openPrep" class="btn ghost">Hazırlık (Kilitli)</button><button id="openPilot" class="btn ghost">Katılımcı Uygulaması</button><button id="openExpert" class="btn ghost">Uzman Formu</button><button id="openProtocol" class="btn ghost">Protokol</button><button id="openExhibit" class="btn ghost">Sergi Modu</button><button id="refresh" class="btn ghost">Yenile</button><button id="download" class="btn primary">CSV</button><button id="openSheet" class="btn ghost">Google E-Tablosu</button><button id="openTest" class="btn ghost">Test Oturumu</button><button id="logout" class="btn ghost">Çıkış</button></div></div>
 
  <section id="view-overview" class="view active">
   <div class="hero"><div><h2>Ana çalışma görünümü</h2><p>Bu ekran gerçek ana çalışma verilerini, yöntem bütünlüğünü ve veri kalitesini birlikte izlemek için tasarlanmıştır.</p></div><span class="badge">Hedef 240 · Her sınıftan 60</span></div>
@@ -122,33 +122,56 @@ table{font-size:10.5px}th{font-size:9px}.note{font-size:10px}
   <div class="card panel">
    <div class="filters"><input id="search" placeholder="Kodu veya senaryoyu ara"><select id="gradeFilter"><option value="">Tüm sınıflar</option><option>9</option><option>10</option><option>11</option><option>12</option></select><select id="conditionFilter"><option value="">Tüm koşullar</option><option value="0">0/4 savunucu</option><option value="1">1/4 savunucu</option><option value="2">2/4 savunucu</option><option value="3">3/4 savunucu</option><option value="4">4/4 savunucu</option></select><select id="deviceFilter"><option value="">Tüm cihazlar</option><option>mobile</option><option>tablet</option><option>desktop</option></select><select id="siteFilter"><option value="">Tüm okul kodları</option></select></div>
    <div class="tablewrap"><table><thead><tr><th>Katılımcı</th><th>Sınıf</th><th>Site</th><th>Cihaz</th><th>Senaryo</th><th>Sıra</th><th>Savunucu</th><th>Karar</th><th>Süre</th><th>Zaman</th></tr></thead><tbody id="recordsBody"></tbody></table></div>
-   <div class="note" style="margin-top:10px">Ana çalışma verileri yalnız <code>main_v1_responses</code> tablosunda tutulur; eski ve hazırlık verileriyle karışmaz.</div>
+   <div class="note" style="margin-top:10px">Ana çalışma verileri Google Sheets <code>Kararlar</code> ve <code>Oturumlar</code> sekmelerinden okunur. Test ve eski Supabase kayıtları bu ekrana dahil edilmez.</div>
   </div>
  </section>
 </section>
 </div>
 
-<div id="resetModal" class="modal hidden"><div class="dialog"><h3>Ana çalışma verileri sıfırlansın mı?</h3><p>Yalnız ana çalışma v1.0 tabloları silinir. Eski çalışma, pilot ve hazırlık veri setlerine dokunulmaz. Onaylamak için <b>SIFIRLA</b> yazın.</p><input id="resetPhrase" placeholder="SIFIRLA"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button id="cancelReset" class="btn ghost">Vazgeç</button><button id="confirmReset" class="btn danger" disabled>Sıfırla</button></div><div id="resetStatus" style="margin-top:8px;font-size:9px;color:var(--rose)"></div></div></div>
 </main>
 <script>
-const SUPABASE_URL="https://urawvamivtcqhztfdazn.supabase.co";
-const SUPABASE_KEY="sb_publishable_-fHeoH2uk6W4NZvSpirgOQ_hdrWzCn3";
-const $=id=>document.getElementById(id);let accessToken=sessionStorage.getItem("dkk_access_token")||"",rows=[],metas=[];
+const SHEETS_ENDPOINT="https://script.google.com/macros/s/AKfycbzVpycSaBrDU1Cx1L4vUklODuweHzyebksxtpbK4tp-qgQ2q2k406TRAZPXAd1sLGs1IQ/exec";
+const $=id=>document.getElementById(id);let accessToken="",rows=[],metas=[];
 function pct(n,d){return d?100*n/d:0}
 function wilson(k,n){if(!n)return[0,0];const z=1.96,p=k/n,den=1+z*z/n,c=(p+z*z/(2*n))/den,h=z*Math.sqrt((p*(1-p)+z*z/(4*n))/n)/den;return[Math.max(0,100*(c-h)),Math.min(100,100*(c+h))]}
 function median(a){if(!a.length)return 0;a=a.slice().sort((x,y)=>x-y);const m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2}
 function labelDecision(d){return({support_aggressor:"Yoruma katılma",silent:"Bir şey yazmama",private_support:"Özelden yazma",public_defend:"Yoruma katılmama",report:"Yönetici/yetişkine iletme"}[d]||d)}
 function showView(v){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+v));document.querySelectorAll(".nav button[data-view]").forEach(x=>x.classList.toggle("active",x.dataset.view===v));window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll(".nav button[data-view]").forEach(b=>b.onclick=()=>showView(b.dataset.view));
-async function signIn(email,password){const r=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({email,password})});const d=await r.json();if(!r.ok)throw new Error(d.error_description||d.msg||"Giriş başarısız.");accessToken=d.access_token;sessionStorage.setItem("dkk_access_token",accessToken)}
-async function fetchPaged(path){const all=[];let offset=0;const size=1000;while(true){const r=await fetch(SUPABASE_URL+"/rest/v1/"+path+"?select=*&order=created_at.desc&limit="+size+"&offset="+offset,{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+accessToken}});if(r.status===401){logout();throw new Error("Oturum süresi doldu.")}if(!r.ok)throw new Error(await r.text());const b=await r.json();all.push(...b);if(b.length<size)break;offset+=size}return all}
-async function fetchMeta(){const all=[];let offset=0,size=1000;while(true){const r=await fetch(SUPABASE_URL+"/rest/v1/main_v1_session_meta?select=*&order=completed_at.desc&limit="+size+"&offset="+offset,{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+accessToken}});if(r.status===401){logout();throw new Error("Oturum süresi doldu.")}if(!r.ok)throw new Error(await r.text());const b=await r.json();all.push(...b);if(b.length<size)break;offset+=size}return all}
-async function fetchAll(){[rows,metas]=await Promise.all([fetchPaged("main_v1_responses"),fetchMeta()]);renderAll()}
-function logout(){accessToken="";sessionStorage.removeItem("dkk_access_token");$("dashboard").classList.add("hidden");$("gate").classList.remove("hidden")}
+async function readPage(table,offset,key){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
+ try{
+  const r=await fetch(SHEETS_ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify({action:"admin_read",table,offset,key}),signal:controller.signal,redirect:"follow",credentials:"omit"});
+  if(!r.ok)throw Error("Google Sheets bağlantısı başarısız.");
+  const result=await r.json();
+  if(!result.ok)throw Error(result.error==="unauthorized"?"Erişim anahtarı geçersiz.":"Veri servisi hazır değil. Apps Script güncel dağıtımını kontrol edin.");
+  if(!Array.isArray(result.rows))throw Error("Geçersiz veri yanıtı.");
+  return result;
+ }finally{clearTimeout(timer)}
+}
+async function fetchPaged(table,key){
+ const out=[];let offset=0;
+ for(let page=0;page<100;page++){
+  const r=await readPage(table,offset,key);out.push(...r.rows);
+  if(r.next===null)return out;
+  if(!Number.isInteger(r.next)||r.next<=offset)throw Error("Geçersiz sayfalama.");
+  offset=r.next;
+ }
+ throw Error("Veri sınırı aşıldı.");
+}
+async function loadData(key){
+ const [decisions,sessions]=await Promise.all([fetchPaged("decisions",key),fetchPaged("sessions",key)]);
+ const allowed=new Set(["support_aggressor","silent","private_support","public_defend","report"]);
+ rows=decisions.filter(r=>/^K\d+$/.test(r.participant_code)&&/^S(0[1-9]|[12][0-9]|30)$/.test(r.scenario_id)&&/^[A-Z0-9_-]{1,24}$/.test(r.site_code)&&r.site_code!=="DKK-TEST"&&["desktop","mobile","tablet"].includes(r.device_class)&&allowed.has(r.decision)).map(r=>({...r,grade:Number(r.grade),order_no:Number(r.order_no),defender_count:Number(r.defender_count),rt_ms:Number(r.rt_ms),created_at:r.server_timestamp}));
+ metas=sessions.filter(r=>r.site_code!=="DKK-TEST");
+ renderAll();
+}
+async function fetchAll(){if(!accessToken)throw Error("Önce giriş yapın.");await loadData(accessToken)}
+function logout(){accessToken="";rows=[];metas=[];$("password").value="";$("dashboard").classList.add("hidden");$("gate").classList.remove("hidden")}
 function sessions(){
  const m=new Map();rows.forEach(r=>{if(!m.has(r.session_id))m.set(r.session_id,[]);m.get(r.session_id).push(r)});return [...m.entries()].map(([id,rs])=>({id,rows:rs,code:rs[0]?.participant_code||"—",grade:+rs[0]?.grade||0,site:rs[0]?.site_code||"—",device:rs[0]?.device_class||"—"}))
 }
-function completeSessions(){return sessions().filter(s=>new Set(s.rows.map(r=>r.scenario_id)).size===30)}
+function completeSessions(){const finished=new Set(metas.map(m=>m.session_id));return sessions().filter(s=>finished.has(s.id)&&new Set(s.rows.map(r=>r.scenario_id)).size===30)}
 function completeRows(){const ids=new Set(completeSessions().map(s=>s.id));return rows.filter(r=>ids.has(r.session_id))}
 function renderOverview(){
  const ss=sessions(),cs=completeSessions(),cr=completeRows();$("sStarted").textContent=ss.length;$("sComplete").textContent=cs.length;$("sRows").textContent=rows.length;$("sPublic").textContent=pct(cr.filter(r=>r.decision==="public_defend").length,cr.length).toFixed(1)+"%";$("sRt").textContent=(cr.length?cr.reduce((a,r)=>a+(+r.rt_ms||0),0)/cr.length/1000:0).toFixed(1);
@@ -193,7 +216,7 @@ function renderScenarios(){
 }
 function renderQuality(){
  const ss=sessions();let inc=0,fast=0,bal=0,clean=0,items=[];
- ss.forEach(s=>{const uniq=new Set(s.rows.map(r=>r.scenario_id)).size,complete=uniq===30,rts=s.rows.map(r=>+r.rt_ms||0),sum=rts.reduce((a,b)=>a+b,0),med=median(rts),counts=[0,1,2,3,4].map(n=>s.rows.filter(r=>+r.defender_count===n).length),badBalance=complete&&counts.some(n=>n!==6),tooFast=complete&&(sum<150000||med<3500);if(!complete)inc++;if(tooFast)fast++;if(badBalance)bal++;if(complete&&!tooFast&&!badBalance)clean++;if(!complete||tooFast||badBalance){let notes=[];if(!complete)notes.push(uniq+"/30 yanıt");if(tooFast)notes.push("hızlı: toplam "+(sum/1000).toFixed(0)+" sn, medyan "+(med/1000).toFixed(1)+" sn");if(badBalance)notes.push("koşul dağılımı "+counts.join("/"));items.push('<div class="qualityrow '+(!complete?"bad":"warn")+'"><b>'+s.code+'</b><span>'+notes.join(" · ")+'</span><span class="tag">İncele</span></div>')}})
+ ss.forEach(s=>{const uniq=new Set(s.rows.map(r=>r.scenario_id)).size,complete=uniq===30&&metas.some(m=>m.session_id===s.id),rts=s.rows.map(r=>+r.rt_ms||0),sum=rts.reduce((a,b)=>a+b,0),med=median(rts),counts=[0,1,2,3,4].map(n=>s.rows.filter(r=>+r.defender_count===n).length),badBalance=complete&&counts.some(n=>n!==6),tooFast=complete&&(sum<150000||med<3500);if(!complete)inc++;if(tooFast)fast++;if(badBalance)bal++;if(complete&&!tooFast&&!badBalance)clean++;if(!complete||tooFast||badBalance){let notes=[];if(!complete)notes.push(uniq+"/30 yanıt"+(uniq===30?" · oturum onayı bekleniyor":""));if(tooFast)notes.push("hızlı: toplam "+(sum/1000).toFixed(0)+" sn, medyan "+(med/1000).toFixed(1)+" sn");if(badBalance)notes.push("koşul dağılımı "+counts.join("/"));items.push('<div class="qualityrow '+(!complete?"bad":"warn")+'"><b>'+s.code+'</b><span>'+notes.join(" · ")+'</span><span class="tag">İncele</span></div>')}})
  $("qIncomplete").textContent=inc;$("qFast").textContent=fast;$("qBalance").textContent=bal;$("qClean").textContent=clean;$("qAware").textContent=pct(metas.filter(m=>m.awareness_guess==="peer_reactions").length,metas.length).toFixed(0)+"%";$("qualityList").innerHTML=items.join("")||'<div class="note">Şu anda tanısal uyarı alan oturum yok.</div>';
 }
 function filteredRows(){const q=$("search").value.trim().toLowerCase(),g=$("gradeFilter").value,c=$("conditionFilter").value,d=$("deviceFilter").value,s=$("siteFilter").value;return rows.filter(r=>(!q||String(r.participant_code).toLowerCase().includes(q)||String(r.scenario_id).toLowerCase().includes(q))&&(!g||String(r.grade)===g)&&(!c||String(r.defender_count)===c)&&(!d||r.device_class===d)&&(!s||r.site_code===s))}
@@ -204,14 +227,15 @@ function renderRecords(){
 function renderAll(){renderOverview();renderDiagnostics();renderScenarios();renderQuality();renderRecords()}
 function csvEscape(v){const s=String(v??"");return/[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
 function downloadCSV(){if(!rows.length){alert("İndirilecek ana çalışma verisi yok.");return}const cols=["id","session_id","participant_code","grade","site_code","device_class","allocation_group","option_order_group","scenario_id","order_no","defender_count","peer_total","decision","decision_kind","rt_ms","study_phase","app_version","condition_version","client_timestamp","created_at"],txt=[cols.join(","),...rows.map(r=>cols.map(k=>csvEscape(r[k])).join(","))].join("\n"),blob=new Blob(["\ufeff"+txt],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="DKK_v1_main_"+Date.now()+".csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)}
-async function resetPilot(){const btn=$("confirmReset");btn.disabled=true;btn.textContent="Sıfırlanıyor…";try{const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/reset_main_v1_data",{method:"POST",headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+accessToken,"Content-Type":"application/json"},body:"{}"});if(!r.ok)throw new Error(await r.text());$("resetModal").classList.add("hidden");await fetchAll();alert("Ana çalışma verileri silindi. Katılımcı kodu K014'e döndü.")}catch(e){$("resetStatus").textContent=e.message}finally{btn.textContent="Sıfırla";btn.disabled=false}}
 function updatePilotLink(){const s=($("linkSite").value||"BATMAN-BILSEM").toUpperCase().replace(/[^A-Z0-9_-]/g,"").slice(0,24)||"BATMAN-BILSEM";$("linkSite").value=s;const base=location.origin+location.pathname.replace(/arastirmaci\/?$/,"");$("pilotLink").value=base+"?site="+encodeURIComponent(s)}
 $("openPrep").onclick=()=>window.open("../arastirmaci-hazirlik/","_blank");$("openPilot").onclick=()=>window.open("../","_blank");$("openExpert").onclick=()=>window.open("../uzman-degerlendirme/","_blank");$("openProtocol").onclick=()=>window.open("../protokol/","_blank");$("openExhibit").onclick=()=>window.open("../sergi/","_blank");
 $("linkSite").addEventListener("input",updatePilotLink);$("copyPilotLink").onclick=async()=>{updatePilotLink();try{await navigator.clipboard.writeText($("pilotLink").value);$("copyPilotLink").textContent="Kopyalandı";setTimeout(()=>$("copyPilotLink").textContent="Kopyala",1200)}catch(e){$("pilotLink").select();document.execCommand("copy")}};updatePilotLink();
-$("login").onclick=async()=>{try{$("loginError").textContent="Giriş yapılıyor…";await signIn($("email").value.trim(),$("password").value);$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");$("loginError").textContent="";await fetchAll()}catch(e){$("loginError").textContent=e.message}};
-$("refresh").onclick=()=>fetchAll().catch(e=>alert(e.message));$("download").onclick=downloadCSV;$("logout").onclick=logout;$("reset").onclick=()=>{$("resetPhrase").value="";$("confirmReset").disabled=true;$("resetStatus").textContent="";$("resetModal").classList.remove("hidden")};$("cancelReset").onclick=()=>$("resetModal").classList.add("hidden");$("resetPhrase").oninput=()=>{$("confirmReset").disabled=$("resetPhrase").value.trim().toLocaleUpperCase("tr-TR").replace(/İ/g,"I")!=="SIFIRLA"};$("confirmReset").onclick=resetPilot;
+$("login").onclick=async()=>{const btn=$("login"),key=$("password").value.trim();if(!key){$("loginError").textContent="Erişim anahtarını girin.";return}btn.disabled=true;try{$("loginError").textContent="Google Sheets verileri alınıyor…";await loadData(key);accessToken=key;$("password").value="";$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");$("loginError").textContent=""}catch(e){$("loginError").textContent=e.message}finally{btn.disabled=false}};
+$("refresh").onclick=()=>fetchAll().catch(e=>alert(e.message));$("download").onclick=downloadCSV;$("logout").onclick=logout;
+$("openSheet").onclick=()=>window.open("https://docs.google.com/spreadsheets/d/1fB0EtrWBxY2PCDiuXEufX7v5Bysl8vfsj1zOCgqRJCg/edit","_blank","noopener");
+$("openTest").onclick=()=>window.open("../?test=1","_blank","noopener");
 ["search","gradeFilter","conditionFilter","deviceFilter","siteFilter"].forEach(id=>$(id).addEventListener("input",renderRecords));
-if(accessToken){$("gate").classList.add("hidden");$("dashboard").classList.remove("hidden");fetchAll().catch(()=>logout())}
+
 </script>
 </body>
 </html>
