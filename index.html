@@ -161,6 +161,8 @@ body{font-size:16px}
 </div>
 
 <script>
+// Enable only after owner deploys and verifies the private spreadsheet web app.
+const SHEETS_ENDPOINT="";
 const SUPABASE_URL="https://urawvamivtcqhztfdazn.supabase.co";
 const SUPABASE_KEY="sb_publishable_-fHeoH2uk6W4NZvSpirgOQ_hdrWzCn3";
 const RESPONSE_URL=SUPABASE_URL+"/rest/v1/main_v1_responses";
@@ -315,6 +317,7 @@ function renderChoiceButtons(container,onClick){
 }
 function setSync(text,cls){$("sync").textContent=text;$("sync").className="sync "+(cls||"")}
 async function ping(){
+ if(SHEETS_ENDPOINT){try{await sheetRequest("health",{});setSync("Bağlantı hazır","ok")}catch(e){setSync("Google Sheets bağlantısı denetlenemedi","bad")}return}
  try{
    const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),5000);
    const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/main_v1_health",{
@@ -356,7 +359,22 @@ function refreshSync(){
   }
  }catch(e){console.error("DKK queue",e);setSync("Yerel kayıt denetlenemedi","bad")}
 }
+async function sheetRequest(action,data){
+ if(!SHEETS_ENDPOINT)throw Error("Google Sheets bağlantısı yapılandırılmadı.");
+ const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),12000);
+ try{
+  const r=await fetch(SHEETS_ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify({action,...data}),signal:ctl.signal,redirect:"follow",credentials:"omit"});
+  if(!r.ok)throw Error("Google Sheets HTTP "+r.status);
+  const result=await r.json();if(result.ok!==true)throw Error("Google Sheets kayıt onayı alınamadı.");
+  return result;
+ }finally{clearTimeout(t)}
+}
 async function sendRow(url,row,meta){
+ if(row.__dkk_sheets===true){
+  const {__dkk_sheets,__dkk_token,...data}=row;
+  try{await sheetRequest(meta?"meta":"response",{row:data,token:__dkk_token});return true}
+  catch(e){console.warn("DKK Sheets",e.name||"Error");return false}
+ }
  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),7000);
  try{
   const r=await fetch(url,{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(row),signal:ctl.signal});
@@ -388,8 +406,13 @@ function flushQueue(key,url){
 function flushPending(){return flushQueue(QUEUE_KEY,RESPONSE_URL)}
 function flushMeta(){return flushQueue(META_QUEUE_KEY,META_URL)}
 function syncAll(){void flushPending();void flushMeta()}
-function queueResponse(row){putPending(QUEUE_KEY,row);refreshSync();void flushPending()}
+function backendRow(row){return SHEETS_ENDPOINT?{...row,__dkk_sheets:true,__dkk_token:state.sheetToken}:row}
+function queueResponse(row){putPending(QUEUE_KEY,backendRow(row));refreshSync();void flushPending()}
 async function allocateCode(){
+ if(SHEETS_ENDPOINT){
+  let lastErr;for(let i=0;i<2;i++){try{const r=await sheetRequest("allocate",{session_id:state.sessionId,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass});if(!/^K\d+$/.test(r.code)||typeof r.token!=="string"||!r.token)throw Error("Geçersiz katılımcı kodu.");state.sheetToken=r.token;return r.code}catch(e){lastErr=e;if(i===0)await new Promise(res=>setTimeout(res,700))}}
+  throw Error("Google Sheets katılımcı kodu alınamadı. İnternet bağlantısını kontrol edip tekrar deneyin.");
+ }
  let lastErr=null;
  for(let attempt=1;attempt<=2;attempt++){
    const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),7000);
@@ -474,7 +497,7 @@ $("finishBtn").onclick=()=>{
  const aware=document.querySelector('input[name="aware"]:checked')?.value||"unsure";
  const meta={session_id:state.sessionId,participant_code:state.code,grade:state.grade,site_code:state.siteCode,device_class:state.deviceClass,
    total_duration_ms:Math.max(0,Math.round(performance.now()-state.mainStartedAt)),allocation_group:state.offset,option_order_group:state.optionGroup,awareness_guess:aware,app_version:APP_VERSION};
- try{putPending(META_QUEUE_KEY,meta)}catch(e){
+ try{putPending(META_QUEUE_KEY,backendRow(meta))}catch(e){
   $("finishBtn").disabled=false;alert("Oturum cihazda kaydedilemedi. Depolama iznini kontrol edin.");return;
  }
  $("doneCode").textContent=state.code;$("doneRt").textContent=(state.rts.reduce((a,b)=>a+b,0)/state.rts.length/1000).toFixed(1)+" sn";show("done");refreshSync();syncAll();
@@ -482,7 +505,7 @@ $("finishBtn").onclick=()=>{
 $("startBtn").onclick=()=>{
  const grade=Number($("grade").value);if(!grade){alert("Sınıf düzeyini seçin.");return}if(!$("consent").checked){alert("Devam etmek için bilgilendirmeyi okuyup onay kutusunu işaretleyin.");return}
  state.grade=grade;state.siteCode=sanitizeSite(new URLSearchParams(location.search).get("site"));state.deviceClass=detectDevice();state.sessionId=uuid();
- state.code=null;state.codeError=null;state.codePromise=allocateAndPrepare();
+ state.code=null;state.sheetToken=null;state.codeError=null;state.codePromise=allocateAndPrepare();
  state.practicePos=0;state.rts=[];$("startBtn").textContent="Alıştırmaya Başla";$("startBtn").disabled=false;
  show("practice");renderPractice();
 };
